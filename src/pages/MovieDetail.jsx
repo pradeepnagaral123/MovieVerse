@@ -1,0 +1,595 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { getMovieDetails, backdropUrl, posterUrl, imageUrl, isApiKeySet } from '../services/omdb';
+import TopNavBar from '../components/TopNavBar';
+import Footer from '../components/Footer';
+
+const STREAMERS = [
+  { name: 'HBO Max', abbr: 'MAX', color: 'bg-black' },
+  { name: 'Prime Video', abbr: 'P+', color: 'bg-blue-600' },
+  { name: 'Apple TV', abbr: 'TV+', color: 'bg-red-600' },
+  { name: 'Netflix', abbr: 'NET', color: 'bg-yellow-500' },
+];
+
+function RatingChart({ rating }) {
+  const pct = ((rating || 0) / 10) * 100;
+  return (
+    <div className="glass-panel p-8 rounded-xl overflow-hidden relative">
+      <div className="flex justify-between items-center mb-8">
+        <h3 className="text-[24px] font-bold">Rating Overview</h3>
+        <div className="flex items-center gap-4 text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
+          <span className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-secondary rounded-full" /> IMDb Score
+          </span>
+        </div>
+      </div>
+      <div className="h-8 w-full bg-surface-container-highest rounded-full overflow-hidden">
+        <div
+          className="h-full bg-gradient-to-r from-secondary/80 to-secondary rounded-full transition-all duration-1000"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <div className="flex justify-between mt-4 text-[12px] tracking-[0.05em] font-medium text-on-surface-variant px-1">
+        <span>0</span>
+        <span>2.5</span>
+        <span>5</span>
+        <span>7.5</span>
+        <span>10</span>
+      </div>
+    </div>
+  );
+}
+
+function StarDisplay({ rating }) {
+  const stars = Math.round(rating / 2);
+  return (
+    <div className="flex items-center gap-1">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <span
+          key={i}
+          className="material-symbols-outlined text-primary-container text-lg"
+          style={{ fontVariationSettings: i < stars ? "'FILL' 1" : "'FILL' 0" }}
+        >
+          star
+        </span>
+      ))}
+    </div>
+  );
+}
+
+export default function MovieDetail() {
+  const { id } = useParams();
+  const [movie, setMovie] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  const handleRate = useCallback((star) => {
+    setUserRating(star);
+  }, []);
+
+  const handleSubmitReview = useCallback(() => {
+    if (userRating > 0) {
+      setReviewSubmitted(true);
+    }
+  }, [userRating]);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    getMovieDetails(id)
+      .then(setMovie)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary-container text-5xl animate-spin">
+          progress_activity
+        </span>
+      </div>
+    );
+  }
+
+  if (error || !movie) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center text-center">
+        <span className="material-symbols-outlined text-error text-6xl mb-4">error</span>
+        <h2 className="text-[24px] font-bold text-on-surface mb-2">Movie not found</h2>
+        <p className="text-on-surface-variant text-[16px] mb-6">{error || 'Something went wrong.'}</p>
+        <Link
+          to="/"
+          className="px-6 py-3 bg-primary-container text-on-primary-container font-bold rounded-lg hover:scale-105 transition-transform"
+        >
+          Back to Home
+        </Link>
+      </div>
+    );
+  }
+
+  const backdrop = movie.backdrop_path ? backdropUrl(movie.backdrop_path) : null;
+  const poster = movie.poster_path ? posterUrl(movie.poster_path) : null;
+  const director = movie.credits?.crew?.find((c) => c.job === 'Director');
+  const cast = movie.credits?.cast?.slice(0, 6) || [];
+  const trailer = movie.videos?.results?.find(
+    (v) => v.type === 'Trailer' && v.site === 'YouTube'
+  ) || movie.videos?.results?.find((v) => v.site === 'YouTube');
+  const similar = movie.similar?.results?.slice(0, 6) || movie.recommendations?.results?.slice(0, 6) || [];
+  const runtimeH = movie.runtime ? Math.floor(movie.runtime / 60) : 0;
+  const runtimeM = movie.runtime ? movie.runtime % 60 : 0;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <TopNavBar activeLink="Movies" />
+
+      <main className="mt-20">
+        {/* Hero Section */}
+        <section className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent z-10" />
+            {backdrop ? (
+              <div
+                className="w-full h-full bg-cover bg-center scale-105 blur-[2px]"
+                style={{ backgroundImage: `url('${backdrop}')` }}
+              />
+            ) : (
+              <div className="w-full h-full bg-surface-container-high" />
+            )}
+          </div>
+          <div className="relative z-20 max-w-[1280px] mx-auto px-4 md:px-12 h-full flex items-end pb-8 md:pb-16">
+            <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-end w-full">
+              {/* Poster */}
+              {poster && (
+                <div className="shrink-0 w-40 md:w-64 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border border-white/10 transform -rotate-1 hover:rotate-0 transition-transform duration-500">
+                  <img className="w-full h-full object-cover" src={poster} alt={movie.title} />
+                </div>
+              )}
+              {/* Movie Info */}
+              <div className="flex-grow">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {movie.genres?.slice(0, 3).map((g) => (
+                    <span
+                      key={g.id}
+                      className="px-3 py-1 bg-primary-container/20 text-primary-container text-[12px] tracking-[0.05em] font-medium rounded-full border border-primary-container/30 uppercase"
+                    >
+                      {g.name}
+                    </span>
+                  ))}
+                  {movie.runtime > 0 && (
+                    <span className="px-3 py-1 bg-white/10 text-on-surface text-[12px] tracking-[0.05em] font-medium rounded-full border border-white/10">
+                      {runtimeH}h {runtimeM}m
+                    </span>
+                  )}
+                </div>
+                <h1 className="text-[28px] md:text-[48px] text-on-surface mb-2 tracking-tight font-black">
+                  {movie.title}
+                </h1>
+                {movie.tagline && (
+                  <p className="text-primary-container text-[16px] italic mb-4">"{movie.tagline}"</p>
+                )}
+                <p className="text-[14px] md:text-[18px] text-on-surface-variant max-w-2xl mb-6 md:mb-8 leading-relaxed">
+                  {movie.overview}
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  {trailer && (
+                    <a
+                      href={`https://www.youtube.com/watch?v=${trailer.key}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-6 md:px-8 py-2.5 md:py-3 bg-primary-container text-on-primary-container text-[16px] md:text-[24px] rounded-lg flex items-center gap-2 hover:scale-105 transition-transform bloom-effect font-bold"
+                    >
+                      <span
+                        className="material-symbols-outlined"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        play_arrow
+                      </span>
+                      Watch Trailer
+                    </a>
+                  )}
+                  <button className="px-6 md:px-8 py-2.5 md:py-3 border border-white/20 text-on-surface text-[16px] md:text-[24px] rounded-lg hover:bg-white/5 transition-colors font-bold">
+                    Add to Watchlist
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Demo Mode Banner */}
+        {!isApiKeySet() && (
+          <div className="max-w-[1280px] mx-auto px-4 md:px-12 pb-4">
+            <div className="p-4 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center gap-3">
+              <span className="material-symbols-outlined text-primary-container">info</span>
+              <p className="text-on-surface text-[14px]">
+                <span className="font-bold text-primary-container">Demo Mode</span> — Showing sample data. Add your OMDB API key to <code className="bg-white/10 px-2 py-0.5 rounded text-[12px]">.env</code> for real movie data.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Stats & Content Grid */}
+        <section className="max-w-[1280px] mx-auto px-4 md:px-12 py-16">
+          <div className="grid grid-cols-12 gap-6">
+            {/* Left Column */}
+            <div className="col-span-12 lg:col-span-8 space-y-12">
+              {/* Bento Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="glass-panel p-6 rounded-xl">
+                  <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant block mb-2">
+                    DIRECTOR
+                  </span>
+                  <span className="text-[24px] font-bold text-on-surface">
+                    {director?.name || 'Unknown'}
+                  </span>
+                </div>
+                <div className="glass-panel p-6 rounded-xl">
+                  <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant block mb-2">
+                    BUDGET
+                  </span>
+                  <span className="text-[24px] font-bold text-on-surface">
+                    {movie.budget ? `$${(movie.budget / 1_000_000).toFixed(0)}M` : 'N/A'}
+                  </span>
+                </div>
+                <div className="glass-panel p-6 rounded-xl">
+                  <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant block mb-2">
+                    REVENUE
+                  </span>
+                  <span className="text-[24px] font-bold text-on-surface">
+                    {movie.revenue ? `$${(movie.revenue / 1_000_000).toFixed(0)}M` : 'N/A'}
+                  </span>
+                </div>
+                <div className="glass-panel p-6 rounded-xl border-primary-container/20">
+                  <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant block mb-2">
+                    GLOBAL RATING
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[32px] font-black text-secondary leading-none">
+                      {movie.vote_average?.toFixed(1) || 'N/A'}
+                    </span>
+                    <span
+                      className="material-symbols-outlined text-secondary"
+                      style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                      star
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rating Chart */}
+              <RatingChart rating={movie.vote_average} />
+
+              {/* Rate This Movie */}
+              <div className="glass-panel p-8 rounded-xl overflow-hidden relative">
+                <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl" />
+                <div className="relative">
+                  <h3 className="text-[24px] font-bold mb-2">Rate this movie</h3>
+                  <p className="text-on-surface-variant text-[14px] mb-6">
+                    Share your thoughts with the community
+                  </p>
+
+                  {reviewSubmitted ? (
+                    <div className="text-center py-8 space-y-3">
+                      <span
+                        className="material-symbols-outlined text-secondary text-5xl"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        check_circle
+                      </span>
+                      <p className="text-on-surface font-bold text-lg">Review submitted!</p>
+                      <p className="text-on-surface-variant text-sm">
+                        You rated this movie {userRating} star{userRating !== 1 ? 's' : ''}
+                      </p>
+                      <button
+                        onClick={() => {
+                          setReviewSubmitted(false);
+                          setUserRating(0);
+                          setReviewText('');
+                        }}
+                        className="text-primary-container text-sm font-bold hover:underline mt-2 cursor-pointer"
+                      >
+                        Edit review
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Star Selector */}
+                      <div className="flex items-center gap-2 mb-6">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            onClick={() => handleRate(star)}
+                            className="cursor-pointer transition-transform hover:scale-125 active:scale-95"
+                          >
+                            <span
+                              className="material-symbols-outlined text-4xl transition-colors"
+                              style={{
+                                fontVariationSettings:
+                                  (hoverRating || userRating) >= star ? "'FILL' 1" : "'FILL' 0",
+                                color:
+                                  (hoverRating || userRating) >= star
+                                    ? '#ff8000'
+                                    : 'rgba(255,255,255,0.2)',
+                              }}
+                            >
+                              star
+                            </span>
+                          </button>
+                        ))}
+                        {userRating > 0 && (
+                          <span className="ml-3 text-primary-container font-bold text-sm">
+                            {userRating}/5
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Review Textarea */}
+                      <textarea
+                        className="w-full bg-white/5 border border-white/10 rounded-lg p-4 text-on-surface placeholder:text-white/20 focus:ring-2 focus:ring-primary-container/50 focus:border-primary-container/50 resize-none outline-none transition-all text-sm"
+                        rows={4}
+                        placeholder="Write a short review (optional)..."
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                      />
+
+                      {/* Submit */}
+                      <div className="flex items-center justify-between mt-4">
+                        <p className="text-on-surface-variant text-[12px]">
+                          {userRating === 0
+                            ? 'Tap a star to rate'
+                            : 'Review will be public'}
+                        </p>
+                        <button
+                          onClick={handleSubmitReview}
+                          disabled={userRating === 0}
+                          className={`px-6 py-2.5 rounded-lg font-bold text-sm transition-all cursor-pointer ${
+                            userRating > 0
+                              ? 'bg-primary-container text-on-primary-container hover:brightness-110 hover:scale-105'
+                              : 'bg-white/5 text-white/20 cursor-not-allowed'
+                          }`}
+                        >
+                          Submit Review
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Cast */}
+              {cast.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-[24px] font-bold">Cast</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {cast.map((person) => (
+                      <div key={person.id} className="glass-panel p-4 rounded-xl flex items-center gap-4">
+                        {person.profile_path ? (
+                          <img
+                            className="w-14 h-14 rounded-full object-cover border border-white/10"
+                            src={imageUrl(person.profile_path, 'w185')}
+                            alt={person.name}
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center">
+                            <span className="material-symbols-outlined text-on-surface-variant">
+                              person
+                            </span>
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-on-surface font-bold text-[14px] leading-tight">
+                            {person.name}
+                          </p>
+                          <p className="text-on-surface-variant text-[12px] tracking-[0.05em] font-medium">
+                            {person.character}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Reviews Section */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* User Notes */}
+                <div className="space-y-4">
+                  <h3 className="text-[24px] font-bold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary-container">lock</span>
+                    My Notes
+                  </h3>
+                  <div className="glass-panel p-6 rounded-xl border-dashed border-white/20 min-h-[300px] flex flex-col">
+                    <textarea
+                      className="bg-transparent border-none focus:ring-0 w-full h-full resize-none text-on-surface placeholder:text-white/20"
+                      placeholder="Add a private note about this film..."
+                    />
+                    <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-2 text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
+                      <span className="material-symbols-outlined text-sm">schedule</span>
+                      Auto-saved
+                    </div>
+                  </div>
+                </div>
+
+                {/* Movie Info */}
+                <div className="space-y-4">
+                  <h3 className="text-[24px] font-bold">Details</h3>
+                  <div className="glass-panel p-6 rounded-xl space-y-4">
+                    {movie.release_date && (
+                      <div className="flex justify-between">
+                        <span className="text-on-surface-variant text-[14px]">Release Date</span>
+                        <span className="text-on-surface text-[14px] font-bold">{movie.release_date}</span>
+                      </div>
+                    )}
+                    {movie.original_language && (
+                      <div className="flex justify-between">
+                        <span className="text-on-surface-variant text-[14px]">Language</span>
+                        <span className="text-on-surface text-[14px] font-bold uppercase">
+                          {movie.original_language}
+                        </span>
+                      </div>
+                    )}
+                    {movie.status && (
+                      <div className="flex justify-between">
+                        <span className="text-on-surface-variant text-[14px]">Status</span>
+                        <span className="text-on-surface text-[14px] font-bold">{movie.status}</span>
+                      </div>
+                    )}
+                    {movie.vote_count > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-on-surface-variant text-[14px]">Total Votes</span>
+                        <span className="text-on-surface text-[14px] font-bold">
+                          {movie.vote_count.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                    {movie.production_companies?.length > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-on-surface-variant text-[14px]">Studio</span>
+                        <span className="text-on-surface text-[14px] font-bold">
+                          {movie.production_companies[0].name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Sidebar */}
+            <div className="col-span-12 lg:col-span-4 space-y-8">
+              {/* Where to Watch */}
+              <div className="glass-panel p-6 rounded-xl space-y-6">
+                <h3 className="text-[24px] font-bold">Where to Watch</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {STREAMERS.map((s) => (
+                    <div
+                      key={s.name}
+                      className="bg-surface-container-high p-4 rounded-lg flex items-center gap-3 border border-white/5 hover:border-primary-container/40 transition-colors cursor-pointer group"
+                    >
+                      <div
+                        className={`w-10 h-10 ${s.color} rounded flex items-center justify-center font-black text-white text-[10px] group-hover:scale-110 transition-transform`}
+                      >
+                        {s.abbr}
+                      </div>
+                      <div>
+                        <span className="text-on-surface block font-bold leading-none">{s.name}</span>
+                        <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
+                          Check
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="glass-panel p-6 rounded-xl space-y-6 overflow-hidden relative">
+                <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl" />
+                <h3 className="text-[24px] font-bold">Quick Facts</h3>
+                <div className="space-y-4">
+                  {director && (
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                      <span className="text-[16px] text-on-surface flex-grow">{director.name}</span>
+                      <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
+                        Director
+                      </span>
+                    </div>
+                  )}
+                  {movie.release_date && (
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                      <span className="text-[16px] text-on-surface flex-grow">{movie.release_date}</span>
+                      <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
+                        Released
+                      </span>
+                    </div>
+                  )}
+                  {movie.genres?.slice(0, 2).map((g) => (
+                    <div key={g.id} className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                      <span className="text-[16px] text-on-surface flex-grow">{g.name}</span>
+                      <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
+                        Genre
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <button className="w-full py-3 bg-white/5 border border-white/10 rounded-lg text-on-surface font-bold hover:bg-white/10 transition-colors">
+                  Explore Full Catalog
+                </button>
+              </div>
+
+              {/* Similar Movies */}
+              {similar.length > 0 && (
+                <div className="glass-panel p-6 rounded-xl space-y-4">
+                  <h3 className="text-[24px] font-bold">You Might Also Like</h3>
+                  <div className="space-y-3">
+                    {similar.slice(0, 4).map((m) => (
+                      <Link
+                        key={m.id}
+                        to={`/movie/${m.id}`}
+                        className="flex gap-3 group cursor-pointer"
+                      >
+                        <div className="w-16 h-24 rounded-lg overflow-hidden shrink-0 border border-white/10">
+                          {m.poster_path ? (
+                            <img
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                              src={imageUrl(m.poster_path, 'w92')}
+                              alt={m.title}
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+                              <span className="material-symbols-outlined text-on-surface-variant">
+                                movie
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-grow">
+                          <p className="text-on-surface font-bold text-[14px] leading-tight group-hover:text-primary-container transition-colors">
+                            {m.title}
+                          </p>
+                          <p className="text-on-surface-variant text-[12px] tracking-[0.05em] font-medium">
+                            {m.release_date?.split('-')[0] || 'TBA'}
+                          </p>
+                          <div className="flex items-center gap-1 mt-1">
+                            <span
+                              className="material-symbols-outlined text-secondary text-sm"
+                              style={{ fontVariationSettings: "'FILL' 1" }}
+                            >
+                              star
+                            </span>
+                            <span className="text-secondary text-[12px] font-bold">
+                              {m.vote_average?.toFixed(1)}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

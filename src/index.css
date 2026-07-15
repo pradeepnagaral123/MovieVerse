@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+@theme {
+  --color-secondary-fixed-dim: #15e558;
+  --color-surface-container-highest: #203840;
+  --color-on-surface-variant: #dfc1af;
+  --color-inverse-surface: #cde7f0;
+  --color-primary-fixed-dim: #ffb787;
+  --color-surface-container-lowest: #001016;
+  --color-primary-container: #ff8000;
+  --color-primary-fixed: #ffdcc7;
+  --color-secondary: #42fc6c;
+  --color-on-secondary-fixed-variant: #00531a;
+  --color-tertiary-fixed: #cbe6ff;
+  --color-surface-container-high: #152d34;
+  --color-inverse-primary: #964900;
+  --color-on-primary-fixed: #311300;
+  --color-inverse-on-surface: #1c343b;
+  --color-surface-bright: #253d44;
+  --color-on-tertiary: #003450;
+  --color-surface-container: #09232a;
+  --color-on-surface: #cde7f0;
+  --color-tertiary-fixed-dim: #90cdff;
+  --color-on-primary-fixed-variant: #723600;
+  --color-on-primary-container: #5e2b00;
+  --color-surface-variant: #203840;
+  --color-secondary-fixed: #6cff80;
+  --color-surface-container-low: #051f26;
+  --color-surface: #00161d;
+  --color-surface-tint: #ffb787;
+  --color-on-background: #cde7f0;
+  --color-on-secondary-container: #005c1d;
+  --color-primary: #ffb787;
+  --color-on-tertiary-fixed: #001e30;
+  --color-on-secondary: #00390f;
+  --color-on-primary: #502400;
+  --color-error: #ffb4ab;
+  --color-outline: #a68b7b;
+  --color-background: #00161d;
+  --color-surface-dim: #00161d;
+  --color-on-secondary-fixed: #002106;
+  --color-tertiary-container: #00acfd;
+  --color-on-error: #690005;
+  --color-outline-variant: #574235;
+  --color-on-tertiary-fixed-variant: #004b72;
+  --color-on-tertiary-container: #003d5d;
+  --color-secondary-container: #00df53;
+  --color-on-error-container: #ffdad6;
+  --color-error-container: #93000a;
+  --color-tertiary: #90cdff;
+
+  --font-display-lg: "Inter", sans-serif;
+  --font-headline-md: "Inter", sans-serif;
+  --font-body-lg: "Inter", sans-serif;
+  --font-body-md: "Inter", sans-serif;
+  --font-label-sm: "JetBrains Mono", monospace;
+
+  --text-display-lg: 48px;
+  --text-display-lg-mobile: 32px;
+  --text-headline-md: 24px;
+  --text-body-lg: 18px;
+  --text-body-md: 16px;
+  --text-label-sm: 12px;
+}
+
+body {
+  background-color: #00161d;
+  color: #cde7f0;
+  overflow-x: hidden;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.glass-card {
+  background: rgba(20, 24, 28, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-card:hover {
+  border-color: #ff8000;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px -10px rgba(255, 128, 0, 0.2);
+}
+
+.glass-panel {
+  background: rgba(20, 24, 28, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cinema-gradient {
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.8));
+}
+
+.poster-gradient {
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+}
+
+.vibe-glow {
+  box-shadow: inset 0 0 15px rgba(255, 128, 0, 0.15);
+}
+
+.search-glow:focus-within {
+  box-shadow: 0 0 20px rgba(255, 128, 0, 0.2);
+  border-color: #ff8000;
+}
+
+.bloom-effect {
+  box-shadow: 0 0 15px rgba(255, 128, 0, 0.2);
+}
+
+.poster-glow:hover {
+  box-shadow: 0 0 20px rgba(255, 128, 0, 0.3);
+  border-color: rgba(255, 128, 0, 0.5);
+}
+
+.rating-drift-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: dash 3s ease-out forwards;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #00161d;
+}
+::-webkit-scrollbar-thumb {
+  background: #152d34;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #ff8000;
+  border-radius: 10px;
+}
+
+.radar-grid {
+  background-image: radial-gradient(circle, rgba(255, 183, 135, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
