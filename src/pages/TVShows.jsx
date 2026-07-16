@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import TopNavBar from '../components/TopNavBar';
 import SideNavBar from '../components/SideNavBar';
 import FloatingActionButton from '../components/FloatingActionButton';
 import Footer from '../components/Footer';
-import { getTrendingTV, getPopularTV, tvPosterUrl, tvBackdropUrl } from '../services/tmdb';
+import { getTrendingTV, getPopularTV, getTopRatedTV, tvPosterUrl, tvBackdropUrl } from '../services/tmdb';
 
 function TVCard({ show, variant = 'poster' }) {
   const [imgError, setImgError] = useState(false);
 
   if (variant === 'hero') {
     return (
-      <div className="relative min-w-[280px] md:min-w-[480px] h-[220px] md:h-[280px] rounded-2xl overflow-hidden group cursor-pointer flex-shrink-0 border border-white/10">
+      <Link
+        to={`/tv/${show.id}`}
+        className="relative min-w-[280px] md:min-w-[480px] h-[220px] md:h-[280px] rounded-2xl overflow-hidden group cursor-pointer flex-shrink-0 border border-white/10"
+      >
         {!imgError && tvBackdropUrl(show.backdrop_path) ? (
           <img
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -41,12 +45,15 @@ function TVCard({ show, variant = 'poster' }) {
             {show.overview}
           </p>
         </div>
-      </div>
+      </Link>
     );
   }
 
   return (
-    <div className="glass-card rounded-2xl overflow-hidden group cursor-pointer flex-shrink-0 w-[160px] md:w-[200px]">
+    <Link
+      to={`/tv/${show.id}`}
+      className="glass-card rounded-2xl overflow-hidden group cursor-pointer flex-shrink-0 w-[160px] md:w-[200px]"
+    >
       <div className="relative aspect-[2/3] overflow-hidden">
         {!imgError && tvPosterUrl(show.poster_path) ? (
           <img
@@ -77,7 +84,7 @@ function TVCard({ show, variant = 'poster' }) {
           )}
         </p>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -139,8 +146,7 @@ function ScrollRow({ children, title, icon }) {
       </div>
       <div
         ref={scrollRef[0]}
-        className="flex gap-4 overflow-x-auto custom-scrollbar pb-4 scroll-smooth"
-        style={{ scrollbarWidth: 'thin' }}
+        className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth"
       >
         {children}
       </div>
@@ -149,20 +155,25 @@ function ScrollRow({ children, title, icon }) {
 }
 
 export default function TVShows() {
+  const navigate = useNavigate();
   const [trending, setTrending] = useState([]);
   const [popular, setPopular] = useState([]);
+  const [topRated, setTopRated] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState('');
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        const [trendingData, popularData] = await Promise.all([
+        const [trendingData, popularData, topRatedData] = await Promise.all([
           getTrendingTV('day'),
           getPopularTV(),
+          getTopRatedTV(),
         ]);
         setTrending(trendingData.results);
         setPopular(popularData.results);
+        setTopRated(topRatedData.results);
       } catch (err) {
         console.error('Failed to fetch TV shows:', err);
       } finally {
@@ -183,9 +194,38 @@ export default function TVShows() {
             <h1 className="text-[32px] md:text-[48px] mb-4 leading-tight font-black tracking-tight">
               Discover <span className="text-primary-container">TV Shows</span>
             </h1>
-            <p className="text-on-surface-variant text-[16px] leading-relaxed">
+            <p className="text-on-surface-variant text-[16px] leading-relaxed mb-6">
               Explore trending series and popular shows. Find your next binge-worthy watch.
             </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (searchInput.trim()) {
+                  navigate(`/tv/search?q=${encodeURIComponent(searchInput.trim())}`);
+                }
+              }}
+              className="relative search-glow transition-all duration-300 rounded-2xl max-w-2xl"
+            >
+              <input
+                className="w-full bg-surface-container-high border-white/10 border p-4 pl-14 pr-12 rounded-2xl text-[16px] focus:ring-0 focus:outline-none placeholder:text-on-surface-variant/50"
+                placeholder="Search TV shows by title, genre, or actor..."
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-primary-container text-3xl">
+                search
+              </span>
+              {searchInput && (
+                <button
+                  type="button"
+                  onClick={() => setSearchInput('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-on-surface-variant hover:text-on-surface transition-colors"
+                >
+                  <span className="material-symbols-outlined text-2xl">close</span>
+                </button>
+              )}
+            </form>
           </div>
         </section>
 
@@ -203,7 +243,7 @@ export default function TVShows() {
               ))}
             </div>
           ) : (
-            <div className="flex gap-4 overflow-x-auto custom-scrollbar pb-4 scroll-smooth" style={{ scrollbarWidth: 'thin' }}>
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth">
               {trending.slice(0, 10).map((show) => (
                 <TVCard key={show.id} show={show} variant="hero" />
               ))}
@@ -222,24 +262,11 @@ export default function TVShows() {
         <ScrollRow title="Top Rated" icon="emoji_events">
           {loading
             ? Array.from({ length: 6 }).map((_, i) => <TVCardSkeleton key={i} />)
-            : [...popular].sort((a, b) => b.vote_average - a.vote_average).slice(0, 10).map((show) => (
+            : topRated.slice(0, 10).map((show) => (
                 <TVCard key={`top-${show.id}`} show={show} />
               ))}
         </ScrollRow>
 
-        <section className="mt-8">
-          <div className="glass-card rounded-2xl p-8 text-center">
-            <span className="material-symbols-outlined text-6xl text-primary-container mb-4">live_tv</span>
-            <h3 className="text-[24px] font-bold mb-2">Can't find what you're looking for?</h3>
-            <p className="text-on-surface-variant text-[14px] mb-6 max-w-md mx-auto">
-              Add a TMDB API key to .env for live data. Currently showing demo content.
-            </p>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-high rounded-xl border border-white/10 text-on-surface-variant text-[12px]">
-              <span className="material-symbols-outlined text-[16px]">key</span>
-              VITE_TMDB_API_KEY
-            </div>
-          </div>
-        </section>
       </main>
 
       <FloatingActionButton />

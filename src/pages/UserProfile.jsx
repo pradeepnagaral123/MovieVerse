@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import TopNavBar from '../components/TopNavBar';
 import Footer from '../components/Footer';
 import FloatingActionButton from '../components/FloatingActionButton';
+import { posterUrl } from '../services/tmdb';
 
 const stats = [
   { label: 'Films Watched', value: '342', icon: 'movie' },
@@ -18,17 +20,17 @@ const recentActivity = [
   { type: 'list', movie: 'Best of 2024', time: '3 days ago' },
 ];
 
-const favoriteMovies = [
-  { title: 'Inception', year: '2010', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCKWJcS5r1fKeYTUq0lTMqPNYv8lUaQxPxO9AGzwIfA6d_cmREDWC-qfhvfy23nBqrKqfmdaTVQDg14n8lT7FTOaKFeIqp9HYyp7xZoxnZZZpIcLb4TuD5ffA7CXbd7Xee3CeCpm8T605hdfZGK-m43cSlBhyCy8wcxd3NwA_1wJJYNN5_5Z0SjlfGXVRyJecCdyUoFQaDUr_9L6l1fjrXNiMUF1RUw1epAEVI-cNNssQ62-saPsr7U' },
-  { title: 'Blade Runner 2049', year: '2017', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDQIMrw11SA0MhCJ3pTwvQiZPCADdmjbRd8Lj48PZfK1KO14Sib21xI1CJUxPMZ4DsDPq0k7gxH1jRZTqmOIRtr1Vkl-ZlEysxsx6BU0QB2zb7yhbtGWpoTOTEQzQYOWSSByMTZaW52F1sf3Q_X_pBfP0_YSJZ9-VeTFSARhcrpgS-QhedMC85yhjIixd6eExd7A5mxsIr-nMvJZ0AJCMvn8aebgP5-m8lZaBUkMhOJ_GO-KU9_N69v' },
-  { title: 'Interstellar', year: '2014', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC2i1wbiVSyidbjyIaIeMUTlB_TrcdWXYvbuRxgLlDEigwCfqQBKiYZUe2JU_APqBGxEphlkTp9LqZzZbzmAB8Lv3MyFS1HAdEWdfENgFvN2VGksz1psB7OK7qQdkIqbT-kg2F9V0oG-A4chARK3OG_9Q3wmNuYLnicIX4w9qvRMts8hQOQievnpsRjiVkixUfw3lkJOslZJnsR9KU54AytKd7ju5ExQmZgoGNoSD37nBJuuMZv0IwA' },
-  { title: 'The Grand Budapest Hotel', year: '2014', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBu-E1PQWuO_aCobecwJ-fFlXGJbGt0PNCXlj0qdDgLIiCnpR8Um0PnxbflSedNMyJEkD8B_uBSxZaW4zZFq5dZ3XA3_NLUehEcQwYoRRIs29bhW4a8c6loSE0aEL8nbwXN0xf7e1mggFB0kitfrt1Oh90jgbPAAOw6B5viJgFyuEBYauIHfvVxfn8AFvhhd-BQXQHVd7CJQAgR1fs85QPRe5vA63LPStptTpvQBchdZdYOsWD2QZJN' },
-];
-
 const tabOptions = ['Overview', 'Reviews', 'Lists', 'Watchlist'];
 
 export default function UserProfile() {
   const [activeTab, setActiveTab] = useState('Overview');
+  const [favoriteMovies] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('cineVerse_favorites') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -107,26 +109,50 @@ export default function UserProfile() {
               <h2 className="text-[24px] font-bold mb-6 flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary-container">favorite</span>
                 Favorites
+                {favoriteMovies.length > 0 && (
+                  <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant bg-white/10 px-2 py-0.5 rounded-full">
+                    {favoriteMovies.length}
+                  </span>
+                )}
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {favoriteMovies.map((movie) => (
-                  <div key={movie.title} className="group cursor-pointer">
-                    <div className="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 relative poster-glow transition-all">
-                      <img
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        src={movie.image}
-                        alt={movie.title}
-                      />
-                    </div>
-                    <p className="mt-2 text-[14px] text-on-surface font-bold leading-tight">
-                      {movie.title}
-                    </p>
-                    <p className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
-                      {movie.year}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              {favoriteMovies.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {favoriteMovies.map((movie) => (
+                    <Link
+                      key={movie.id}
+                      to={`/movie/${movie.id}`}
+                      className="group cursor-pointer"
+                    >
+                      <div className="aspect-[2/3] rounded-xl overflow-hidden border border-white/10 relative poster-glow transition-all">
+                        {movie.poster_path ? (
+                          <img
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            src={posterUrl(movie.poster_path)}
+                            alt={movie.title}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+                            <span className="material-symbols-outlined text-on-surface-variant text-5xl">movie</span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="mt-2 text-[14px] text-on-surface font-bold leading-tight group-hover:text-primary-container transition-colors">
+                        {movie.title}
+                      </p>
+                      <p className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
+                        {movie.release_date ? new Date(movie.release_date).getFullYear() : 'TBA'}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="glass-card p-8 rounded-xl text-center">
+                  <span className="material-symbols-outlined text-on-surface-variant text-4xl mb-3 block">favorite_border</span>
+                  <p className="text-on-surface-variant text-[14px]">
+                    No favorites yet. Tap the heart on any movie to add it here.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Recent Activity */}

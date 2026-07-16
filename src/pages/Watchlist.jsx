@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNavBar from '../components/TopNavBar';
 import SideNavBar from '../components/SideNavBar';
-import { searchMovies } from '../services/omdb';
+import { searchMovies, posterUrl, tvPosterUrl, searchTVShows } from '../services/tmdb';
 import Footer from '../components/Footer';
 
 const movies = [
@@ -115,9 +115,13 @@ const marathons = [
 ];
 
 function MovieCard({ movie, onRemove, onDetails }) {
-  const poster = movie.image || movie.poster_path;
-  const year = movie.year || (movie.release_date ? new Date(movie.release_date).getFullYear() : '');
+  const isShow = movie.type === 'show';
+  const poster = movie.image || (isShow ? tvPosterUrl(movie.poster_path) : posterUrl(movie.poster_path));
+  const year = movie.year || (isShow
+    ? (movie.first_air_date ? new Date(movie.first_air_date).getFullYear() : '')
+    : (movie.release_date ? new Date(movie.release_date).getFullYear() : ''));
   const runtime = movie.runtime || '';
+  const displayName = isShow ? movie.name : movie.title;
 
   return (
     <div className="group relative glass-card rounded-xl overflow-hidden flex flex-col">
@@ -130,7 +134,7 @@ function MovieCard({ movie, onRemove, onDetails }) {
           />
         ) : (
           <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
-            <span className="material-symbols-outlined text-5xl text-on-surface-variant">movie</span>
+            <span className="material-symbols-outlined text-5xl text-on-surface-variant">{isShow ? 'tv' : 'movie'}</span>
           </div>
         )}
         <div className="absolute inset-0 poster-gradient opacity-80" />
@@ -160,7 +164,7 @@ function MovieCard({ movie, onRemove, onDetails }) {
           </button>
           <div className="flex justify-between gap-2">
             <button
-              onClick={() => onDetails?.(movie)}
+              onClick={() => onDetails?.({ ...movie, type: movie.type || 'movie' })}
               className="flex-1 border border-white/20 py-1.5 md:py-2 rounded-lg text-[11px] md:text-[12px] font-bold hover:bg-white/10"
             >
               DETAILS
@@ -176,7 +180,7 @@ function MovieCard({ movie, onRemove, onDetails }) {
       </div>
       <div className="p-3 md:p-4 flex-grow flex flex-col justify-between">
         <div>
-          <h3 className="text-[14px] md:text-[18px] text-white line-clamp-1 font-bold">{movie.title}</h3>
+          <h3 className="text-[14px] md:text-[18px] text-white line-clamp-1 font-bold">{displayName}</h3>
           <div className="flex items-center gap-1.5 md:gap-2 text-on-surface-variant text-[10px] md:text-[12px] tracking-[0.05em] font-medium mt-0.5 md:mt-1">
             {year && <span>{year}</span>}
             {year && runtime && <span className="w-1 h-1 bg-white/20 rounded-full" />}
@@ -248,6 +252,7 @@ function SearchModal({ open, onClose, onAdd, addedIds }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('movies');
   const debounceRef = useRef(null);
 
   useEffect(() => {
@@ -263,8 +268,13 @@ function SearchModal({ open, onClose, onAdd, addedIds }) {
     setLoading(true);
     debounceRef.current = setTimeout(async () => {
       try {
-        const data = await searchMovies(q);
-        setResults(data.results);
+        if (activeTab === 'movies') {
+          const data = await searchMovies(q);
+          setResults(data.results.map((m) => ({ ...m, type: 'movie' })));
+        } else {
+          const data = await searchTVShows(q);
+          setResults(data.results.map((s) => ({ ...s, type: 'show' })));
+        }
       } catch {
         setResults([]);
       } finally {
@@ -275,12 +285,19 @@ function SearchModal({ open, onClose, onAdd, addedIds }) {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query]);
+  }, [query, activeTab]);
 
   const handleClose = () => {
     setQuery('');
     setResults([]);
+    setActiveTab('movies');
     onClose();
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setResults([]);
+    setQuery('');
   };
 
   if (!open) return null;
@@ -299,11 +316,37 @@ function SearchModal({ open, onClose, onAdd, addedIds }) {
           </button>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-2 px-6 pt-4">
+          <button
+            onClick={() => handleTabChange('movies')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[14px] font-bold transition-all ${
+              activeTab === 'movies'
+                ? 'bg-primary-container text-on-primary-container'
+                : 'bg-white/5 text-on-surface-variant hover:bg-white/10'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">movie</span>
+            Movies
+          </button>
+          <button
+            onClick={() => handleTabChange('shows')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[14px] font-bold transition-all ${
+              activeTab === 'shows'
+                ? 'bg-primary-container text-on-primary-container'
+                : 'bg-white/5 text-on-surface-variant hover:bg-white/10'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">tv</span>
+            TV Shows
+          </button>
+        </div>
+
         <div className="px-6 pt-4 pb-2">
           <div className="relative">
             <input
               className="w-full bg-surface-container-high border-white/10 border p-4 pl-14 rounded-xl text-[16px] focus:ring-0 focus:outline-none placeholder:text-on-surface-variant/50"
-              placeholder="Start typing to search movies..."
+              placeholder={activeTab === 'movies' ? 'Search movies by title...' : 'Search TV shows by title...'}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -338,66 +381,86 @@ function SearchModal({ open, onClose, onAdd, addedIds }) {
 
           {!loading && query.trim() && results.length === 0 && (
             <div className="text-center py-12">
-              <span className="material-symbols-outlined text-5xl text-on-surface-variant/50 mb-3 block">movie_filter</span>
-              <p className="text-on-surface-variant text-[16px]">No movies found. Try a different title.</p>
+              <span className="material-symbols-outlined text-5xl text-on-surface-variant/50 mb-3 block">
+                {activeTab === 'movies' ? 'movie_filter' : 'tv'}
+              </span>
+              <p className="text-on-surface-variant text-[16px]">
+                No {activeTab === 'movies' ? 'movies' : 'shows'} found. Try a different title.
+              </p>
             </div>
           )}
 
           {results.length > 0 && (
             <div className="space-y-2 pt-4">
-              {results.map((movie) => (
-                <div
-                  key={movie.id}
-                  className="flex gap-4 p-3 rounded-xl hover:bg-surface-container-high transition-colors group cursor-pointer"
-                >
-                  <div className="w-16 h-24 rounded-lg overflow-hidden bg-surface-container-high shrink-0 border border-white/10">
-                    {movie.poster_path ? (
-                      <img
-                        className="w-full h-full object-cover"
-                        src={movie.poster_path}
-                        alt={movie.title}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-symbols-outlined text-on-surface-variant">movie</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0 py-1">
-                    <h4 className="text-on-surface font-bold text-[14px] line-clamp-1 group-hover:text-primary-container transition-colors">
-                      {movie.title}
-                    </h4>
-                    <p className="text-on-surface-variant text-[12px] mt-0.5">
-                      {movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'}
-                    </p>
-                    {movie.overview && (
-                      <p className="text-on-surface-variant text-[11px] mt-1 line-clamp-2 leading-relaxed">
-                        {movie.overview}
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => onAdd?.(movie)}
-                    disabled={addedIds?.has(movie.id)}
-                    className={`self-center shrink-0 w-9 h-9 rounded-full border flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 ${
-                      addedIds?.has(movie.id)
-                        ? 'border-secondary/40 bg-secondary/10 text-secondary cursor-default opacity-100'
-                        : 'border-primary-container/40 text-primary-container hover:bg-primary-container hover:text-on-primary-container cursor-pointer'
-                    }`}
+              {results.map((item) => {
+                const isShow = item.type === 'show';
+                const displayName = isShow ? item.name : item.title;
+                const date = isShow ? item.first_air_date : item.release_date;
+                const imgSrc = isShow ? tvPosterUrl(item.poster_path) : posterUrl(item.poster_path);
+                const icon = isShow ? 'tv' : 'movie';
+
+                return (
+                  <div
+                    key={item.id}
+                    className="flex gap-4 p-3 rounded-xl hover:bg-surface-container-high transition-colors group cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[20px]">
-                      {addedIds?.has(movie.id) ? 'check' : 'add'}
-                    </span>
-                  </button>
-                </div>
-              ))}
+                    <div className="w-16 h-24 rounded-lg overflow-hidden bg-surface-container-high shrink-0 border border-white/10">
+                      {item.poster_path ? (
+                        <img
+                          className="w-full h-full object-cover"
+                          src={imgSrc}
+                          alt={displayName}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="material-symbols-outlined text-on-surface-variant">{icon}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0 py-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-on-surface font-bold text-[14px] line-clamp-1 group-hover:text-primary-container transition-colors">
+                          {displayName}
+                        </h4>
+                        <span className="text-[10px] tracking-[0.05em] font-medium text-on-surface-variant bg-white/10 px-1.5 py-0.5 rounded shrink-0">
+                          {isShow ? 'SHOW' : 'MOVIE'}
+                        </span>
+                      </div>
+                      <p className="text-on-surface-variant text-[12px] mt-0.5">
+                        {date ? new Date(date).getFullYear() : 'N/A'}
+                      </p>
+                      {item.overview && (
+                        <p className="text-on-surface-variant text-[11px] mt-1 line-clamp-2 leading-relaxed">
+                          {item.overview}
+                        </p>
+                      )}
+                    </div>
+                    {addedIds?.has(item.id) ? (
+                      <span className="self-center shrink-0 w-9 h-9 rounded-full border border-secondary/40 bg-secondary/10 text-secondary flex items-center justify-center opacity-100">
+                        <span className="material-symbols-outlined text-[20px]">check</span>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => onAdd?.(item)}
+                        className="self-center shrink-0 w-9 h-9 rounded-full border border-primary-container/40 text-primary-container hover:bg-primary-container hover:text-on-primary-container cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">add</span>
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
 
           {!query.trim() && (
             <div className="text-center py-12">
-              <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-3 block">theaters</span>
-              <p className="text-on-surface-variant text-[14px]">Search for movies to add to your watchlist</p>
+              <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-3 block">
+                {activeTab === 'movies' ? 'theaters' : 'tv'}
+              </span>
+              <p className="text-on-surface-variant text-[14px]">
+                Search for {activeTab === 'movies' ? 'movies' : 'TV shows'} to add to your watchlist
+              </p>
             </div>
           )}
         </div>
@@ -416,6 +479,13 @@ export default function Watchlist() {
       return [];
     }
   });
+  const [addedShows, setAddedShows] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('cineVerse_show_watchlist') || '[]');
+    } catch {
+      return [];
+    }
+  });
   const [removedIds, setRemovedIds] = useState(() => {
     try {
       return new Set(JSON.parse(localStorage.getItem('cineVerse_watchlist_removed') || '[]'));
@@ -424,27 +494,48 @@ export default function Watchlist() {
     }
   });
 
-  const addedIds = new Set(addedMovies.map((m) => m.id));
+  const addedIds = new Set([...addedMovies.map((m) => m.id), ...addedShows.map((s) => s.id)]);
 
-  const handleAddMovie = (movie) => {
-    if (addedIds.has(movie.id)) return;
-    const entry = {
-      id: movie.id,
-      title: movie.title,
-      poster_path: movie.poster_path,
-      release_date: movie.release_date,
-      added: true,
-    };
-    const updated = [entry, ...addedMovies];
-    setAddedMovies(updated);
-    localStorage.setItem('cineVerse_watchlist', JSON.stringify(updated));
+  const handleAddMovie = (item) => {
+    if (addedIds.has(item.id)) return;
+    const isShow = item.type === 'show';
+
+    if (isShow) {
+      const entry = {
+        id: item.id,
+        name: item.name,
+        poster_path: item.poster_path,
+        first_air_date: item.first_air_date,
+        added: true,
+        type: 'show',
+      };
+      const updated = [entry, ...addedShows];
+      setAddedShows(updated);
+      localStorage.setItem('cineVerse_show_watchlist', JSON.stringify(updated));
+    } else {
+      const entry = {
+        id: item.id,
+        title: item.title,
+        poster_path: item.poster_path,
+        release_date: item.release_date,
+        added: true,
+        type: 'movie',
+      };
+      const updated = [entry, ...addedMovies];
+      setAddedMovies(updated);
+      localStorage.setItem('cineVerse_watchlist', JSON.stringify(updated));
+    }
   };
 
   const handleRemoveMovie = (id) => {
-    if (addedIds.has(id)) {
+    if (addedMovies.some((m) => m.id === id)) {
       const updated = addedMovies.filter((m) => m.id !== id);
       setAddedMovies(updated);
       localStorage.setItem('cineVerse_watchlist', JSON.stringify(updated));
+    } else if (addedShows.some((s) => s.id === id)) {
+      const updated = addedShows.filter((s) => s.id !== id);
+      setAddedShows(updated);
+      localStorage.setItem('cineVerse_show_watchlist', JSON.stringify(updated));
     } else {
       const updated = new Set(removedIds);
       updated.add(id);
@@ -454,11 +545,14 @@ export default function Watchlist() {
   };
 
   const visibleStatic = movies.filter((m) => !removedIds.has(m.id ?? m.title));
-  const totalFilms = visibleStatic.length + addedMovies.length;
+  const totalFilms = visibleStatic.length + addedMovies.length + addedShows.length;
 
-  const handleDetails = (movie) => {
-    const id = movie.id || movie.imdbID || movie.title;
-    navigate(`/movie/${id}`);
+  const handleDetails = (item) => {
+    if (item.type === 'show') {
+      navigate(`/tv/${item.id}`);
+    } else {
+      navigate(`/movie/${item.id}`);
+    }
   };
   return (
     <div className="min-h-screen bg-background relative">
@@ -510,6 +604,9 @@ export default function Watchlist() {
 
         {/* Movie Grid */}
         <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-6">
+          {addedShows.map((show) => (
+            <MovieCard key={`show-${show.id}`} movie={{ ...show, type: 'show' }} onRemove={handleRemoveMovie} onDetails={handleDetails} />
+          ))}
           {addedMovies.map((movie) => (
             <MovieCard key={`added-${movie.id}`} movie={movie} onRemove={handleRemoveMovie} onDetails={handleDetails} />
           ))}
@@ -526,13 +623,13 @@ export default function Watchlist() {
                   <span className="material-symbols-outlined text-primary-container text-[32px]">add</span>
                 </div>
                 <span className="text-on-surface-variant text-[12px] tracking-[0.05em] font-medium group-hover:text-primary-container transition-colors">
-                  Add Movie
+                  Add to Watchlist
                 </span>
               </div>
             </div>
             <div className="p-4 flex-grow flex flex-col justify-between">
               <div>
-                <h3 className="text-[18px] text-primary-container/60 line-clamp-1 font-bold">New Movie</h3>
+                <h3 className="text-[18px] text-primary-container/60 line-clamp-1 font-bold">Add New</h3>
                 <div className="flex items-center gap-2 text-on-surface-variant text-[12px] tracking-[0.05em] font-medium mt-1">
                   <span>Tap to search</span>
                 </div>

@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 const navLinks = [
   { label: 'Movies', href: '/' },
   { label: 'TV Shows', href: '/tv' },
-  { label: 'Reviews', href: '/reviews' },
+  { label: 'Recommendations', href: '/recommendations' },
   { label: 'Watchlist', href: '/watchlist' },
   { label: 'Community', href: '/community' },
 ];

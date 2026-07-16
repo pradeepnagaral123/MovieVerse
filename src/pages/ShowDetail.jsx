@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getMovieDetails, isTmdbKeySet, backdropUrl, posterUrl, imageUrl } from '../services/tmdb';
+import { getTVShowDetails, isTmdbKeySet, tvBackdropUrl, tvPosterUrl, imageUrl } from '../services/tmdb';
 import TopNavBar from '../components/TopNavBar';
 import Footer from '../components/Footer';
 
@@ -40,27 +40,10 @@ function RatingChart({ rating }) {
   );
 }
 
-function StarDisplay({ rating }) {
-  const stars = Math.round(rating / 2);
-  return (
-    <div className="flex items-center gap-1">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span
-          key={i}
-          className="material-symbols-outlined text-primary-container text-lg"
-          style={{ fontVariationSettings: i < stars ? "'FILL' 1" : "'FILL' 0" }}
-        >
-          star
-        </span>
-      ))}
-    </div>
-  );
-}
-
-export default function MovieDetail() {
+export default function ShowDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [movie, setMovie] = useState(null);
+  const [show, setShow] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userRating, setUserRating] = useState(0);
@@ -68,7 +51,6 @@ export default function MovieDetail() {
   const [reviewText, setReviewText] = useState('');
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleRate = useCallback((star) => {
     setUserRating(star);
@@ -81,69 +63,41 @@ export default function MovieDetail() {
   }, [userRating]);
 
   const toggleWatchlist = useCallback(() => {
-    if (!movie) return;
+    if (!show) return;
     let list = [];
     try {
-      list = JSON.parse(localStorage.getItem('cineVerse_watchlist') || '[]');
+      list = JSON.parse(localStorage.getItem('cineVerse_show_watchlist') || '[]');
     } catch { /* empty */ }
 
-    const exists = list.some((m) => m.id === movie.id);
+    const exists = list.some((s) => s.id === show.id);
     let updated;
     if (exists) {
-      updated = list.filter((m) => m.id !== movie.id);
+      updated = list.filter((s) => s.id !== show.id);
     } else {
       updated = [
         {
-          id: movie.id,
-          title: movie.title,
-          poster_path: movie.poster_path,
-          release_date: movie.release_date,
+          id: show.id,
+          name: show.name,
+          poster_path: show.poster_path,
+          first_air_date: show.first_air_date,
           added: true,
         },
         ...list,
       ];
     }
-    localStorage.setItem('cineVerse_watchlist', JSON.stringify(updated));
+    localStorage.setItem('cineVerse_show_watchlist', JSON.stringify(updated));
     setIsInWatchlist(!exists);
-  }, [movie]);
-
-  const toggleFavorite = useCallback(() => {
-    if (!movie) return;
-    let list = [];
-    try {
-      list = JSON.parse(localStorage.getItem('cineVerse_favorites') || '[]');
-    } catch { /* empty */ }
-
-    const exists = list.some((m) => m.id === movie.id);
-    let updated;
-    if (exists) {
-      updated = list.filter((m) => m.id !== movie.id);
-    } else {
-      updated = [
-        {
-          id: movie.id,
-          title: movie.title,
-          poster_path: movie.poster_path,
-          release_date: movie.release_date,
-        },
-        ...list,
-      ];
-    }
-    localStorage.setItem('cineVerse_favorites', JSON.stringify(updated));
-    setIsFavorite(!exists);
-  }, [movie]);
+  }, [show]);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
-    getMovieDetails(id)
+    getTVShowDetails(id)
       .then((data) => {
-        setMovie(data);
+        setShow(data);
         try {
-          const list = JSON.parse(localStorage.getItem('cineVerse_watchlist') || '[]');
-          setIsInWatchlist(list.some((m) => m.id === data.id));
-          const favList = JSON.parse(localStorage.getItem('cineVerse_favorites') || '[]');
-          setIsFavorite(favList.some((m) => m.id === data.id));
+          const list = JSON.parse(localStorage.getItem('cineVerse_show_watchlist') || '[]');
+          setIsInWatchlist(list.some((s) => s.id === data.id));
         } catch { /* empty */ }
       })
       .catch((err) => setError(err.message))
@@ -160,36 +114,34 @@ export default function MovieDetail() {
     );
   }
 
-  if (error || !movie) {
+  if (error || !show) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center text-center">
         <span className="material-symbols-outlined text-error text-6xl mb-4">error</span>
-        <h2 className="text-[24px] font-bold text-on-surface mb-2">Movie not found</h2>
+        <h2 className="text-[24px] font-bold text-on-surface mb-2">Show not found</h2>
         <p className="text-on-surface-variant text-[16px] mb-6">{error || 'Something went wrong.'}</p>
         <Link
-          to="/"
+          to="/tv"
           className="px-6 py-3 bg-primary-container text-on-primary-container font-bold rounded-lg hover:scale-105 transition-transform"
         >
-          Back to Home
+          Back to TV Shows
         </Link>
       </div>
     );
   }
 
-  const backdrop = movie.backdrop_path ? backdropUrl(movie.backdrop_path) : null;
-  const poster = movie.poster_path ? posterUrl(movie.poster_path) : null;
-  const director = movie.credits?.crew?.find((c) => c.job === 'Director');
-  const cast = movie.credits?.cast?.slice(0, 6) || [];
-  const trailer = movie.videos?.results?.find(
+  const backdrop = show.backdrop_path ? tvBackdropUrl(show.backdrop_path) : null;
+  const poster = show.poster_path ? tvPosterUrl(show.poster_path) : null;
+  const creator = show.created_by?.[0];
+  const cast = show.credits?.cast?.slice(0, 6) || [];
+  const trailer = show.videos?.results?.find(
     (v) => v.type === 'Trailer' && v.site === 'YouTube'
-  ) || movie.videos?.results?.find((v) => v.site === 'YouTube');
-  const similar = movie.similar?.results?.slice(0, 6) || movie.recommendations?.results?.slice(0, 6) || [];
-  const runtimeH = movie.runtime ? Math.floor(movie.runtime / 60) : 0;
-  const runtimeM = movie.runtime ? movie.runtime % 60 : 0;
+  ) || show.videos?.results?.find((v) => v.site === 'YouTube');
+  const similar = show.similar?.results?.slice(0, 6) || show.recommendations?.results?.slice(0, 6) || [];
 
   return (
     <div className="min-h-screen bg-background">
-      <TopNavBar activeLink="Movies" />
+      <TopNavBar activeLink="TV Shows" />
 
       <main className="mt-20">
         {/* Hero Section */}
@@ -210,13 +162,13 @@ export default function MovieDetail() {
               {/* Poster */}
               {poster && (
                 <div className="shrink-0 w-40 md:w-64 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border border-white/10 transform -rotate-1 hover:rotate-0 transition-transform duration-500">
-                  <img className="w-full h-full object-cover" src={poster} alt={movie.title} />
+                  <img className="w-full h-full object-cover" src={poster} alt={show.name} />
                 </div>
               )}
-              {/* Movie Info */}
+              {/* Show Info */}
               <div className="flex-grow">
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {movie.genres?.slice(0, 3).map((g) => (
+                  {show.genres?.slice(0, 3).map((g) => (
                     <span
                       key={g.id}
                       className="px-3 py-1 bg-primary-container/20 text-primary-container text-[12px] tracking-[0.05em] font-medium rounded-full border border-primary-container/30 uppercase"
@@ -224,20 +176,25 @@ export default function MovieDetail() {
                       {g.name}
                     </span>
                   ))}
-                  {movie.runtime > 0 && (
+                  {show.number_of_seasons > 0 && (
                     <span className="px-3 py-1 bg-white/10 text-on-surface text-[12px] tracking-[0.05em] font-medium rounded-full border border-white/10">
-                      {runtimeH}h {runtimeM}m
+                      {show.number_of_seasons} Season{show.number_of_seasons !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                  {show.number_of_episodes > 0 && (
+                    <span className="px-3 py-1 bg-white/10 text-on-surface text-[12px] tracking-[0.05em] font-medium rounded-full border border-white/10">
+                      {show.number_of_episodes} Episodes
                     </span>
                   )}
                 </div>
                 <h1 className="text-[28px] md:text-[48px] text-on-surface mb-2 tracking-tight font-black">
-                  {movie.title}
+                  {show.name}
                 </h1>
-                {movie.tagline && (
-                  <p className="text-primary-container text-[16px] italic mb-4">"{movie.tagline}"</p>
+                {show.tagline && (
+                  <p className="text-primary-container text-[16px] italic mb-4">"{show.tagline}"</p>
                 )}
                 <p className="text-[14px] md:text-[18px] text-on-surface-variant max-w-2xl mb-6 md:mb-8 leading-relaxed">
-                  {movie.overview}
+                  {show.overview}
                 </p>
                 <div className="flex flex-wrap gap-4">
                   {trailer && (
@@ -272,21 +229,6 @@ export default function MovieDetail() {
                     </span>
                     {isInWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
                   </button>
-                  <button
-                    onClick={toggleFavorite}
-                    className={`px-4 md:px-6 py-2.5 md:py-3 border text-[16px] md:text-[24px] rounded-lg flex items-center gap-2 transition-all font-bold ${
-                      isFavorite
-                        ? 'border-red-500/40 bg-red-500/10 text-red-500'
-                        : 'border-white/20 text-on-surface hover:bg-white/5'
-                    }`}
-                  >
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      {isFavorite ? 'favorite' : 'favorite_border'}
-                    </span>
-                  </button>
                 </div>
               </div>
             </div>
@@ -299,7 +241,7 @@ export default function MovieDetail() {
             <div className="p-4 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center gap-3">
               <span className="material-symbols-outlined text-primary-container">info</span>
               <p className="text-on-surface text-[14px]">
-                <span className="font-bold text-primary-container">Demo Mode</span> — Showing sample data. Add your TMDB API key to <code className="bg-white/10 px-2 py-0.5 rounded text-[12px]">.env</code> for real movie data.
+                <span className="font-bold text-primary-container">Demo Mode</span> — Showing sample data. Add your TMDB API key to <code className="bg-white/10 px-2 py-0.5 rounded text-[12px]">.env</code> for real show data.
               </p>
             </div>
           </div>
@@ -314,26 +256,26 @@ export default function MovieDetail() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="glass-panel p-6 rounded-xl">
                   <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant block mb-2">
-                    DIRECTOR
+                    CREATED BY
                   </span>
                   <span className="text-[24px] font-bold text-on-surface">
-                    {director?.name || 'Unknown'}
+                    {creator?.name || 'Unknown'}
                   </span>
                 </div>
                 <div className="glass-panel p-6 rounded-xl">
                   <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant block mb-2">
-                    BUDGET
+                    SEASONS
                   </span>
                   <span className="text-[24px] font-bold text-on-surface">
-                    {movie.budget ? `$${(movie.budget / 1_000_000).toFixed(0)}M` : 'N/A'}
+                    {show.number_of_seasons || 'N/A'}
                   </span>
                 </div>
                 <div className="glass-panel p-6 rounded-xl">
                   <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant block mb-2">
-                    REVENUE
+                    EPISODES
                   </span>
                   <span className="text-[24px] font-bold text-on-surface">
-                    {movie.revenue ? `$${(movie.revenue / 1_000_000).toFixed(0)}M` : 'N/A'}
+                    {show.number_of_episodes || 'N/A'}
                   </span>
                 </div>
                 <div className="glass-panel p-6 rounded-xl border-primary-container/20">
@@ -342,7 +284,7 @@ export default function MovieDetail() {
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="text-[32px] font-black text-secondary leading-none">
-                      {movie.vote_average?.toFixed(1) || 'N/A'}
+                      {show.vote_average?.toFixed(1) || 'N/A'}
                     </span>
                     <span
                       className="material-symbols-outlined text-secondary"
@@ -355,13 +297,13 @@ export default function MovieDetail() {
               </div>
 
               {/* Rating Chart */}
-              <RatingChart rating={movie.vote_average} />
+              <RatingChart rating={show.vote_average} />
 
-              {/* Rate This Movie */}
+              {/* Rate This Show */}
               <div className="glass-panel p-8 rounded-xl overflow-hidden relative">
                 <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl" />
                 <div className="relative">
-                  <h3 className="text-[24px] font-bold mb-2">Rate this movie</h3>
+                  <h3 className="text-[24px] font-bold mb-2">Rate this show</h3>
                   <p className="text-on-surface-variant text-[14px] mb-6">
                     Share your thoughts with the community
                   </p>
@@ -376,7 +318,7 @@ export default function MovieDetail() {
                       </span>
                       <p className="text-on-surface font-bold text-lg">Review submitted!</p>
                       <p className="text-on-surface-variant text-sm">
-                        You rated this movie {userRating} star{userRating !== 1 ? 's' : ''}
+                        You rated this show {userRating} star{userRating !== 1 ? 's' : ''}
                       </p>
                       <button
                         onClick={() => {
@@ -505,7 +447,7 @@ export default function MovieDetail() {
                   <div className="glass-panel p-6 rounded-xl border-dashed border-white/20 min-h-[300px] flex flex-col">
                     <textarea
                       className="bg-transparent border-none focus:ring-0 w-full h-full resize-none text-on-surface placeholder:text-white/20"
-                      placeholder="Add a private note about this film..."
+                      placeholder="Add a private note about this show..."
                     />
                     <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-2 text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
                       <span className="material-symbols-outlined text-sm">schedule</span>
@@ -514,43 +456,59 @@ export default function MovieDetail() {
                   </div>
                 </div>
 
-                {/* Movie Info */}
+                {/* Show Info */}
                 <div className="space-y-4">
                   <h3 className="text-[24px] font-bold">Details</h3>
                   <div className="glass-panel p-6 rounded-xl space-y-4">
-                    {movie.release_date && (
+                    {show.first_air_date && (
                       <div className="flex justify-between">
-                        <span className="text-on-surface-variant text-[14px]">Release Date</span>
-                        <span className="text-on-surface text-[14px] font-bold">{movie.release_date}</span>
+                        <span className="text-on-surface-variant text-[14px]">First Air Date</span>
+                        <span className="text-on-surface text-[14px] font-bold">{show.first_air_date}</span>
                       </div>
                     )}
-                    {movie.original_language && (
+                    {show.original_language && (
                       <div className="flex justify-between">
                         <span className="text-on-surface-variant text-[14px]">Language</span>
                         <span className="text-on-surface text-[14px] font-bold uppercase">
-                          {movie.original_language}
+                          {show.original_language}
                         </span>
                       </div>
                     )}
-                    {movie.status && (
+                    {show.status && (
                       <div className="flex justify-between">
                         <span className="text-on-surface-variant text-[14px]">Status</span>
-                        <span className="text-on-surface text-[14px] font-bold">{movie.status}</span>
+                        <span className="text-on-surface text-[14px] font-bold">{show.status}</span>
                       </div>
                     )}
-                    {movie.vote_count > 0 && (
+                    {show.vote_count > 0 && (
                       <div className="flex justify-between">
                         <span className="text-on-surface-variant text-[14px]">Total Votes</span>
                         <span className="text-on-surface text-[14px] font-bold">
-                          {movie.vote_count.toLocaleString()}
+                          {show.vote_count.toLocaleString()}
                         </span>
                       </div>
                     )}
-                    {movie.production_companies?.length > 0 && (
+                    {show.networks?.length > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-on-surface-variant text-[14px]">Studio</span>
+                        <span className="text-on-surface-variant text-[14px]">Network</span>
                         <span className="text-on-surface text-[14px] font-bold">
-                          {movie.production_companies[0].name}
+                          {show.networks[0].name}
+                        </span>
+                      </div>
+                    )}
+                    {show.origin_country?.length > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-on-surface-variant text-[14px]">Country</span>
+                        <span className="text-on-surface text-[14px] font-bold">
+                          {show.origin_country.join(', ')}
+                        </span>
+                      </div>
+                    )}
+                    {show.episode_run_time?.length > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-on-surface-variant text-[14px]">Episode Runtime</span>
+                        <span className="text-on-surface text-[14px] font-bold">
+                          {show.episode_run_time[0]} min
                         </span>
                       </div>
                     )}
@@ -591,29 +549,29 @@ export default function MovieDetail() {
                 <div className="absolute -right-8 -top-8 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl" />
                 <h3 className="text-[24px] font-bold">Quick Facts</h3>
                 <div className="space-y-4">
-                  {director && (
+                  {creator && (
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
                         check_circle
                       </span>
-                      <span className="text-[16px] text-on-surface flex-grow">{director.name}</span>
+                      <span className="text-[16px] text-on-surface flex-grow">{creator.name}</span>
                       <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
-                        Director
+                        Creator
                       </span>
                     </div>
                   )}
-                  {movie.release_date && (
+                  {show.first_air_date && (
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
                         check_circle
                       </span>
-                      <span className="text-[16px] text-on-surface flex-grow">{movie.release_date}</span>
+                      <span className="text-[16px] text-on-surface flex-grow">{show.first_air_date}</span>
                       <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
-                        Released
+                        First Aired
                       </span>
                     </div>
                   )}
-                  {movie.genres?.slice(0, 2).map((g) => (
+                  {show.genres?.slice(0, 2).map((g) => (
                     <div key={g.id} className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
                         check_circle
@@ -624,44 +582,58 @@ export default function MovieDetail() {
                       </span>
                     </div>
                   ))}
+                  {show.status && (
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                      <span className="text-[16px] text-on-surface flex-grow">{show.status}</span>
+                      <span className="text-[12px] tracking-[0.05em] font-medium text-on-surface-variant">
+                        Status
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <button className="w-full py-3 bg-white/5 border border-white/10 rounded-lg text-on-surface font-bold hover:bg-white/10 transition-colors">
-                  Explore Full Catalog
-                </button>
+                <Link
+                  to="/tv"
+                  className="block w-full py-3 bg-white/5 border border-white/10 rounded-lg text-on-surface font-bold hover:bg-white/10 transition-colors text-center"
+                >
+                  Explore More Shows
+                </Link>
               </div>
 
-              {/* Similar Movies */}
+              {/* Similar Shows */}
               {similar.length > 0 && (
                 <div className="glass-panel p-6 rounded-xl space-y-4">
                   <h3 className="text-[24px] font-bold">You Might Also Like</h3>
                   <div className="space-y-3">
-                    {similar.slice(0, 4).map((m) => (
+                    {similar.slice(0, 4).map((s) => (
                       <Link
-                        key={m.id}
-                        to={`/movie/${m.id}`}
+                        key={s.id}
+                        to={`/tv/${s.id}`}
                         className="flex gap-3 group cursor-pointer"
                       >
                         <div className="w-16 h-24 rounded-lg overflow-hidden shrink-0 border border-white/10">
-                          {m.poster_path ? (
+                          {s.poster_path ? (
                             <img
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                              src={imageUrl(m.poster_path, 'w92')}
-                              alt={m.title}
+                              src={imageUrl(s.poster_path, 'w92')}
+                              alt={s.name}
                             />
                           ) : (
                             <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
                               <span className="material-symbols-outlined text-on-surface-variant">
-                                movie
+                                tv
                               </span>
                             </div>
                           )}
                         </div>
                         <div className="flex-grow">
                           <p className="text-on-surface font-bold text-[14px] leading-tight group-hover:text-primary-container transition-colors">
-                            {m.title}
+                            {s.name}
                           </p>
                           <p className="text-on-surface-variant text-[12px] tracking-[0.05em] font-medium">
-                            {m.release_date?.split('-')[0] || 'TBA'}
+                            {s.first_air_date?.split('-')[0] || 'TBA'}
                           </p>
                           <div className="flex items-center gap-1 mt-1">
                             <span
@@ -671,7 +643,7 @@ export default function MovieDetail() {
                               star
                             </span>
                             <span className="text-secondary text-[12px] font-bold">
-                              {m.vote_average?.toFixed(1)}
+                              {s.vote_average?.toFixed(1)}
                             </span>
                           </div>
                         </div>
