@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getMovieDetails, isTmdbKeySet, backdropUrl, posterUrl, imageUrl } from '../services/tmdb';
 import TopNavBar from '../components/TopNavBar';
+import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 const STREAMERS = [
@@ -686,6 +687,7 @@ export default function MovieDetail() {
       </main>
 
       <Footer />
+      <MobileNav />
     </div>
   );
 }

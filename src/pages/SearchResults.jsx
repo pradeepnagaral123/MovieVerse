@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { searchMovies, imageUrl, isTmdbKeySet } from '../services/tmdb';
 import TopNavBar from '../components/TopNavBar';
+import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 export default function SearchResults() {
@@ -77,7 +78,7 @@ export default function SearchResults() {
     <div className="min-h-screen bg-background">
       <TopNavBar />
 
-      <main className="pt-28 pb-20 px-4 md:px-12 max-w-[1280px] mx-auto">
+      <main className="pt-28 pb-24 md:pb-20 px-4 md:px-12 max-w-[1280px] mx-auto">
         {!isTmdbKeySet() && (
           <div className="mb-6 p-4 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center gap-3">
             <span className="material-symbols-outlined text-primary-container">info</span>
@@ -226,6 +227,7 @@ export default function SearchResults() {
       </main>
 
       <Footer />
+      <MobileNav />
     </div>
   );
 }

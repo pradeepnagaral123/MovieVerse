@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import TopNavBar from '../components/TopNavBar';
 import SideNavBar from '../components/SideNavBar';
+import MobileNav from '../components/MobileNav';
 import FloatingActionButton from '../components/FloatingActionButton';
 import Footer from '../components/Footer';
 import { getTrendingTV, getPopularTV, getTopRatedTV, tvPosterUrl, tvBackdropUrl } from '../services/tmdb';
@@ -67,8 +68,8 @@ function TVCard({ show, variant = 'poster' }) {
             <span className="material-symbols-outlined text-5xl text-on-surface-variant">tv</span>
           </div>
         )}
-        <div className="absolute inset-0 poster-gradient opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 poster-gradient opacity-60 md:opacity-0 md:group-hover:opacity-100 transition-opacity" />
+        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <span className="material-symbols-outlined text-primary-container text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
           <span className="text-on-surface text-[11px] font-bold">{show.vote_average?.toFixed(1)}</span>
         </div>
@@ -188,7 +189,7 @@ export default function TVShows() {
       <TopNavBar activeLink="TV Shows" />
       <SideNavBar />
 
-      <main className="xl:ml-64 pt-28 px-4 md:px-12 pb-20 max-w-[1400px]">
+      <main className="xl:ml-64 pt-28 px-4 md:px-12 pb-24 md:pb-20 max-w-[1400px]">
         <section className="mb-12">
           <div className="max-w-3xl">
             <h1 className="text-[32px] md:text-[48px] mb-4 leading-tight font-black tracking-tight">
@@ -271,6 +272,7 @@ export default function TVShows() {
 
       <FloatingActionButton />
       <Footer />
+      <MobileNav />
     </div>
   );
 }

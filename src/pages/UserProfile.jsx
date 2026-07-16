@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import TopNavBar from '../components/TopNavBar';
+import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 import FloatingActionButton from '../components/FloatingActionButton';
 import { posterUrl } from '../services/tmdb';
@@ -302,6 +303,7 @@ export default function UserProfile() {
 
       <Footer />
       <FloatingActionButton />
+      <MobileNav />
     </div>
   );
 }

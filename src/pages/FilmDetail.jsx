@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import TopNavBar from '../components/TopNavBar';
+import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 const streamers = [
@@ -420,6 +421,7 @@ export default function FilmDetail() {
       </main>
 
       <Footer />
+      <MobileNav />
     </div>
   );
 }

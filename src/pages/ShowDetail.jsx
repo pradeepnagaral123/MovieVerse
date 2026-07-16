@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getTVShowDetails, isTmdbKeySet, tvBackdropUrl, tvPosterUrl, imageUrl } from '../services/tmdb';
 import TopNavBar from '../components/TopNavBar';
+import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 const STREAMERS = [
@@ -658,6 +659,7 @@ export default function ShowDetail() {
       </main>
 
       <Footer />
+      <MobileNav />
     </div>
   );
 }

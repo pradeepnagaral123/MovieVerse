@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNavBar from '../components/TopNavBar';
 import SideNavBar from '../components/SideNavBar';
+import MobileNav from '../components/MobileNav';
 import { searchMovies, posterUrl, tvPosterUrl, searchTVShows } from '../services/tmdb';
 import Footer from '../components/Footer';
 
@@ -158,7 +159,7 @@ function MovieCard({ movie, onRemove, onDetails }) {
             </span>
           </div>
         )}
-        <div className="absolute inset-0 flex flex-col justify-end p-3 md:p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60 backdrop-blur-sm">
+        <div className="absolute inset-0 flex flex-col justify-end p-3 md:p-4 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-background/60 backdrop-blur-sm">
           <button className="w-full bg-primary-container text-on-primary-container py-2.5 md:py-3 rounded-lg font-bold flex items-center justify-center gap-2 mb-2 md:mb-3 active:scale-95 transition-transform text-[13px] md:text-[14px]">
             <span className="material-symbols-outlined text-[18px] md:text-[20px]">play_arrow</span> Watch Now
           </button>
@@ -442,7 +443,7 @@ function SearchModal({ open, onClose, onAdd, addedIds }) {
                     ) : (
                       <button
                         onClick={() => onAdd?.(item)}
-                        className="self-center shrink-0 w-9 h-9 rounded-full border border-primary-container/40 text-primary-container hover:bg-primary-container hover:text-on-primary-container cursor-pointer flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                        className="self-center shrink-0 w-9 h-9 rounded-full border border-primary-container/40 text-primary-container hover:bg-primary-container hover:text-on-primary-container cursor-pointer flex items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
                       >
                         <span className="material-symbols-outlined text-[20px]">add</span>
                       </button>
@@ -565,7 +566,7 @@ export default function Watchlist() {
         <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-secondary/5 blur-[180px] rounded-full" />
       </div>
 
-      <main className="md:ml-64 pt-24 md:pt-28 pb-20 px-4 md:px-12 max-w-[1280px] mx-auto min-h-screen">
+      <main className="xl:ml-64 pt-24 md:pt-28 pb-24 md:pb-20 px-4 md:px-12 max-w-[1280px] mx-auto min-h-screen">
         {/* Hero Header */}
         <header className="mb-8 md:mb-12 relative">
           <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary-container/10 blur-[100px] pointer-events-none" />
@@ -663,6 +664,7 @@ export default function Watchlist() {
 
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} onAdd={handleAddMovie} addedIds={addedIds} />
       <Footer />
+      <MobileNav />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNavBar from '../components/TopNavBar';
 import SideNavBar from '../components/SideNavBar';
+import MobileNav from '../components/MobileNav';
 import FloatingActionButton from '../components/FloatingActionButton';
 import Footer from '../components/Footer';
 import { getTrendingMovies, getUpcomingMovies, getNowPlayingMovies, posterUrl, backdropUrl } from '../services/tmdb';
@@ -44,10 +45,10 @@ function MovieCard({ movie, variant = 'poster', onDetails }) {
             {movie.overview}
           </p>
         </div>
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/40">
+        <div className="absolute inset-0 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-background/40">
           <button
             onClick={(e) => { e.stopPropagation(); onDetails?.(movie); }}
-            className="border border-white/20 bg-background/60 text-on-surface py-2.5 px-6 rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-white/10 transition-colors flex items-center gap-2"
+            className="border border-white/20 bg-background/60 text-on-surface py-2.5 px-6 rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-white/10 active:bg-white/10 transition-colors flex items-center gap-2"
           >
             <span className="material-symbols-outlined text-[18px]">info</span>
             Details
@@ -72,15 +73,15 @@ function MovieCard({ movie, variant = 'poster', onDetails }) {
             <span className="material-symbols-outlined text-5xl text-on-surface-variant">movie</span>
           </div>
         )}
-        <div className="absolute inset-0 poster-gradient opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 poster-gradient opacity-60 md:opacity-0 md:group-hover:opacity-100 transition-opacity" />
+        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <span className="material-symbols-outlined text-primary-container text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
           <span className="text-on-surface text-[11px] font-bold">{movie.vote_average?.toFixed(1)}</span>
         </div>
-        <div className="absolute inset-0 flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60">
+        <div className="absolute inset-0 flex flex-col justify-end p-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-background/60">
           <button
             onClick={(e) => { e.stopPropagation(); onDetails?.(movie); }}
-            className="w-full border border-white/20 py-2 rounded-lg text-[11px] md:text-[12px] font-bold uppercase tracking-wider hover:bg-white/10 transition-colors flex items-center justify-center gap-1"
+            className="w-full border border-white/20 py-2 rounded-lg text-[11px] md:text-[12px] font-bold uppercase tracking-wider hover:bg-white/10 active:bg-white/10 transition-colors flex items-center justify-center gap-1"
           >
             <span className="material-symbols-outlined text-[16px]">info</span>
             Details
@@ -172,7 +173,7 @@ export default function HomeFeed() {
       <TopNavBar activeLink="Movies" />
       <SideNavBar />
 
-      <main className="xl:ml-64 pt-28 px-4 md:px-12 pb-20 max-w-[1400px]">
+      <main className="xl:ml-64 pt-28 px-4 md:px-12 pb-24 md:pb-20 max-w-[1400px]">
         {/* Vibe Search Header */}
         <section className="mb-12">
           <div className="max-w-3xl">
@@ -324,6 +325,7 @@ export default function HomeFeed() {
 
       <FloatingActionButton />
       <Footer />
+      <MobileNav />
     </div>
   );
 }

@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="bg-surface py-8 md:py-12 px-4 md:px-12 mt-12 border-t border-white/5">
       <div className="max-w-[1280px] mx-auto xl:ml-64 flex flex-col md:flex-row justify-between items-start gap-12">
@@ -20,19 +24,19 @@ export default function Footer() {
             </h5>
             <ul className="space-y-2 text-on-surface-variant text-[16px]">
               <li>
-                <Link className="hover:text-primary-container transition-colors" to="/">Movies</Link>
+                <Link className="hover:text-primary-container transition-colors" to="/" onClick={scrollToTop}>Movies</Link>
               </li>
               <li>
-                <Link className="hover:text-primary-container transition-colors" to="/tv">TV Shows</Link>
+                <Link className="hover:text-primary-container transition-colors" to="/tv" onClick={scrollToTop}>TV Shows</Link>
               </li>
               <li>
-                <Link className="hover:text-primary-container transition-colors" to="/watchlist">Watchlist</Link>
+                <Link className="hover:text-primary-container transition-colors" to="/watchlist" onClick={scrollToTop}>Watchlist</Link>
               </li>
               <li>
-                <Link className="hover:text-primary-container transition-colors" to="/community">Community</Link>
+                <Link className="hover:text-primary-container transition-colors" to="/community" onClick={scrollToTop}>Community</Link>
               </li>
               <li>
-                <Link className="hover:text-primary-container transition-colors" to="/profile">Profile</Link>
+                <Link className="hover:text-primary-container transition-colors" to="/profile" onClick={scrollToTop}>Profile</Link>
               </li>
             </ul>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import TopNavBar from '../components/TopNavBar';
 import SideNavBar from '../components/SideNavBar';
+import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 const heroVillains = [
@@ -314,7 +315,7 @@ export default function Polls() {
       <TopNavBar activeLink="Community" />
       <SideNavBar />
 
-      <main className="xl:ml-64 pt-28 px-4 md:px-12 pb-20 max-w-[1280px] mx-auto">
+      <main className="xl:ml-64 pt-28 px-4 md:px-12 pb-24 md:pb-20 max-w-[1280px] mx-auto">
         <div className="flex flex-col xl:flex-row gap-6">
           {/* Left Side: Polls Feed */}
           <div className="flex-1 space-y-12">
@@ -329,7 +330,7 @@ export default function Polls() {
                     Who is the ultimate cinematic villain?
                   </h1>
                 </div>
-                <div className="hidden sm:block text-right">
+                <div className="text-right">
                   <p className="text-on-surface-variant text-sm">24,582 votes cast</p>
                   <p className="text-primary text-xs font-mono">
                     Ends in {pad(timeLeft.h)}:{pad(timeLeft.m)}:{pad(timeLeft.s)}
@@ -472,6 +473,7 @@ export default function Polls() {
       </main>
 
       <Footer />
+      <MobileNav />
     </div>
   );
 }

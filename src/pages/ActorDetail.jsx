@@ -7,6 +7,7 @@ import {
   imageUrl,
 } from '../services/tmdb';
 import TopNavBar from '../components/TopNavBar';
+import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 const MOVIE_GENRES = {
@@ -281,6 +282,7 @@ export default function ActorDetail() {
       </main>
 
       <Footer />
+      <MobileNav />
     </div>
   );
 }

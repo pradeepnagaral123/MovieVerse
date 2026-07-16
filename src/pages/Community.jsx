@@ -1,5 +1,6 @@
 import TopNavBar from '../components/TopNavBar';
 import SideNavBar from '../components/SideNavBar';
+import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 const topFilms = [
@@ -88,7 +89,7 @@ export default function Community() {
       <TopNavBar activeLink="Community" />
       <SideNavBar />
 
-      <main className="xl:ml-64 pt-28 px-4 md:px-12 pb-20 max-w-[1280px] mx-auto space-y-12">
+      <main className="xl:ml-64 pt-28 px-4 md:px-12 pb-24 md:pb-20 max-w-[1280px] mx-auto space-y-12">
         {/* Hero Section */}
         <section className="relative h-64 md:h-96 rounded-3xl overflow-hidden glass-card group">
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
@@ -295,6 +296,7 @@ export default function Community() {
       </main>
 
       <Footer />
+      <MobileNav />
     </div>
   );
 }

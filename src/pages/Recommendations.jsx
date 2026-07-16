@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getMoviesByGenre, isTmdbKeySet, imageUrl } from '../services/tmdb';
 import TopNavBar from '../components/TopNavBar';
+import MobileNav from '../components/MobileNav';
 import Footer from '../components/Footer';
 
 const GENRES = [
@@ -199,6 +200,7 @@ export default function Recommendations() {
       </main>
 
       <Footer />
+      <MobileNav />
     </div>
   );
 }
