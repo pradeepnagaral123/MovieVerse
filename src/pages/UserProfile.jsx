@@ -45,15 +45,15 @@ export default function UserProfile() {
             <div className="w-32 h-32 rounded-full border-4 border-primary-container overflow-hidden shadow-2xl">
               <img
                 className="w-full h-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW_WsP_rWwVu3IkEsdfGbq8slZ3yNuUBsk2Hkr4mkDMte4KMx03t1raztNxSpb3xdhcoFO9ol7ch_KH33YlBWR8HZQiHFvccNpFW3ouKVVBNj-phrqhJowl6oHlAbu9Bw-pcTYJdCkAqdVj9faNk1GJAnrYucnnTASc7_DyxHAPkdA_3ja1tRzFNYGCT4_dG40YGs5ukdRmMpTqS0jlL3E3FJESSoUXgD26gV2CTsSj9F9bMZSxWgh"
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"
                 alt="Profile"
               />
             </div>
             <div className="flex-grow pb-2">
               <h1 className="text-[32px] md:text-[48px] font-black text-on-surface tracking-tight">
-                Sarah Chen
+                John Doe
               </h1>
-              <p className="text-on-surface-variant text-[16px]">@sarahcineVerse &bull; Film Critic</p>
+              <p className="text-on-surface-variant text-[16px]">@johncineVerse &bull; Film Critic</p>
             </div>
             <div className="flex gap-3 pb-2">
               <button className="px-6 py-2 bg-primary-container text-on-primary-container font-bold rounded-lg hover:scale-105 transition-transform text-[14px]">
