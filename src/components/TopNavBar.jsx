@@ -6,7 +6,6 @@ const navLinks = [
   { label: 'TV Shows', href: '/tv', icon: 'tv' },
   { label: 'Recommendations', href: '/recommendations', icon: 'explore' },
   { label: 'Watchlist', href: '/watchlist', icon: 'bookmark' },
-  { label: 'Community', href: '/community', icon: 'groups' },
 ];
 
 export default function TopNavBar({ activeLink = 'Movies' }) {

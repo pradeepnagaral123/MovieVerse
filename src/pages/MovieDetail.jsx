@@ -194,23 +194,116 @@ export default function MovieDetail() {
 
       <main className="mt-20">
         {/* Hero Section */}
-        <section className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden">
-          <div className="absolute inset-0 z-0">
+        <section className="relative w-full overflow-hidden">
+          {/* Backdrop */}
+          <div className="absolute inset-0 z-0 h-[50vh] md:h-[70vh]">
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent z-10" />
             {backdrop ? (
               <div
-                className="w-full h-full bg-cover bg-center scale-105 blur-[2px]"
+                className="w-full h-full bg-cover bg-center scale-105"
                 style={{ backgroundImage: `url('${backdrop}')` }}
               />
             ) : (
               <div className="w-full h-full bg-surface-container-high" />
             )}
           </div>
-          <div className="relative z-20 max-w-[1280px] mx-auto px-4 md:px-12 h-full flex items-end pb-8 md:pb-16">
-            <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-end w-full">
+
+          {/* Mobile Layout */}
+          <div className="relative z-20 md:hidden">
+            {/* Compact backdrop */}
+            <div className="h-[40vh] w-full" />
+            {/* Poster + Info row */}
+            <div className="max-w-[1280px] mx-auto px-4 -mt-16 relative">
+              <div className="flex gap-4">
+                {poster && (
+                  <div className="shrink-0 w-28 aspect-[2/3] rounded-lg overflow-hidden shadow-2xl border border-white/10">
+                    <img className="w-full h-full object-cover" src={poster} alt={movie.title} />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0 pt-1">
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {movie.genres?.slice(0, 2).map((g) => (
+                      <span
+                        key={g.id}
+                        className="px-2 py-0.5 bg-primary-container/20 text-primary-container text-[10px] tracking-[0.05em] font-medium rounded-full border border-primary-container/30 uppercase"
+                      >
+                        {g.name}
+                      </span>
+                    ))}
+                    {movie.runtime > 0 && (
+                      <span className="px-2 py-0.5 bg-white/10 text-on-surface text-[10px] tracking-[0.05em] font-medium rounded-full border border-white/10">
+                        {runtimeH}h {runtimeM}m
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="text-[22px] text-on-surface mb-1 tracking-tight font-black leading-tight line-clamp-2">
+                    {movie.title}
+                  </h1>
+                  {movie.tagline && (
+                    <p className="text-primary-container text-[11px] italic mb-1.5 line-clamp-1">"{movie.tagline}"</p>
+                  )}
+                  <p className="text-[12px] text-on-surface-variant mb-3 leading-relaxed line-clamp-3">
+                    {movie.overview}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {trailer && (
+                      <a
+                        href={`https://www.youtube.com/watch?v=${trailer.key}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 bg-primary-container text-on-primary-container text-[13px] rounded-lg flex items-center gap-1.5 hover:scale-105 transition-transform bloom-effect font-bold"
+                      >
+                        <span
+                          className="material-symbols-outlined text-[18px]"
+                          style={{ fontVariationSettings: "'FILL' 1" }}
+                        >
+                          play_arrow
+                        </span>
+                        Trailer
+                      </a>
+                    )}
+                    <button
+                      onClick={toggleWatchlist}
+                      className={`px-4 py-2 border text-[13px] rounded-lg flex items-center gap-1.5 transition-all font-bold ${
+                        isInWatchlist
+                          ? 'border-secondary/40 bg-secondary/10 text-secondary'
+                          : 'border-white/20 text-on-surface hover:bg-white/5'
+                      }`}
+                    >
+                      <span
+                        className="material-symbols-outlined text-[18px]"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        {isInWatchlist ? 'bookmark' : 'bookmark_border'}
+                      </span>
+                    </button>
+                    <button
+                      onClick={toggleFavorite}
+                      className={`px-3 py-2 border text-[13px] rounded-lg flex items-center gap-1.5 transition-all font-bold ${
+                        isFavorite
+                          ? 'border-red-500/40 bg-red-500/10 text-red-500'
+                          : 'border-white/20 text-on-surface hover:bg-white/5'
+                      }`}
+                    >
+                      <span
+                        className="material-symbols-outlined text-[18px]"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        {isFavorite ? 'favorite' : 'favorite_border'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="relative z-20 hidden md:block max-w-[1280px] mx-auto px-12 h-[70vh] items-end pb-16">
+            <div className="flex gap-12 items-end w-full h-full pt-20">
               {/* Poster */}
               {poster && (
-                <div className="shrink-0 w-40 md:w-64 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border border-white/10 transform -rotate-1 hover:rotate-0 transition-transform duration-500">
+                <div className="shrink-0 w-64 aspect-[2/3] rounded-xl overflow-hidden shadow-2xl border border-white/10 transform -rotate-1 hover:rotate-0 transition-transform duration-500">
                   <img className="w-full h-full object-cover" src={poster} alt={movie.title} />
                 </div>
               )}
@@ -231,13 +324,13 @@ export default function MovieDetail() {
                     </span>
                   )}
                 </div>
-                <h1 className="text-[28px] md:text-[48px] text-on-surface mb-2 tracking-tight font-black">
+                <h1 className="text-[48px] text-on-surface mb-2 tracking-tight font-black">
                   {movie.title}
                 </h1>
                 {movie.tagline && (
                   <p className="text-primary-container text-[16px] italic mb-4">"{movie.tagline}"</p>
                 )}
-                <p className="text-[14px] md:text-[18px] text-on-surface-variant max-w-2xl mb-6 md:mb-8 leading-relaxed">
+                <p className="text-[18px] text-on-surface-variant max-w-2xl mb-8 leading-relaxed">
                   {movie.overview}
                 </p>
                 <div className="flex flex-wrap gap-4">
@@ -246,7 +339,7 @@ export default function MovieDetail() {
                       href={`https://www.youtube.com/watch?v=${trailer.key}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-6 md:px-8 py-2.5 md:py-3 bg-primary-container text-on-primary-container text-[16px] md:text-[24px] rounded-lg flex items-center gap-2 hover:scale-105 transition-transform bloom-effect font-bold"
+                      className="px-8 py-3 bg-primary-container text-on-primary-container text-[24px] rounded-lg flex items-center gap-2 hover:scale-105 transition-transform bloom-effect font-bold"
                     >
                       <span
                         className="material-symbols-outlined"
@@ -259,7 +352,7 @@ export default function MovieDetail() {
                   )}
                   <button
                     onClick={toggleWatchlist}
-                    className={`px-6 md:px-8 py-2.5 md:py-3 border text-[16px] md:text-[24px] rounded-lg flex items-center gap-2 transition-all font-bold ${
+                    className={`px-8 py-3 border text-[24px] rounded-lg flex items-center gap-2 transition-all font-bold ${
                       isInWatchlist
                         ? 'border-secondary/40 bg-secondary/10 text-secondary'
                         : 'border-white/20 text-on-surface hover:bg-white/5'
@@ -275,7 +368,7 @@ export default function MovieDetail() {
                   </button>
                   <button
                     onClick={toggleFavorite}
-                    className={`px-4 md:px-6 py-2.5 md:py-3 border text-[16px] md:text-[24px] rounded-lg flex items-center gap-2 transition-all font-bold ${
+                    className={`px-6 py-3 border text-[24px] rounded-lg flex items-center gap-2 transition-all font-bold ${
                       isFavorite
                         ? 'border-red-500/40 bg-red-500/10 text-red-500'
                         : 'border-white/20 text-on-surface hover:bg-white/5'
