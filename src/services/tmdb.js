@@ -609,11 +609,13 @@ export async function getMoviesByGenre(genreId, page = 1) {
   if (!TMDB_API_KEY) {
     await new Promise((r) => setTimeout(r, 500));
     const filtered = MOCK_MOVIES.filter((m) => m.genre_ids?.includes(genreId));
-    return {
-      results: filtered.length > 0 ? filtered : MOCK_MOVIES.slice(0, 6),
-      total_results: filtered.length || MOCK_MOVIES.length,
-      total_pages: 1,
-    };
+    const pool = filtered.length > 0 ? filtered : MOCK_MOVIES;
+    const results = [];
+    for (let i = 0; i < 20; i++) {
+      const base = pool[i % pool.length];
+      results.push({ ...base, id: base.id + i + (filtered.length > 0 ? 0 : 1000000) });
+    }
+    return { results, total_results: results.length, total_pages: 1 };
   }
   const data = await fetchTMDB('/discover/movie', {
     with_genres: genreId,
