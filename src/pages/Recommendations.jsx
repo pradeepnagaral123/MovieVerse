@@ -29,22 +29,29 @@ export default function Recommendations() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    if (!selectedGenre) return;
+  const fetchMovies = (genreId) => {
     setLoading(true);
     setError(null);
-    getMoviesByGenre(selectedGenre.id)
+    getMoviesByGenre(genreId)
       .then((data) => setMovies(data.results))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [selectedGenre]);
+  };
+
+  useEffect(() => {
+    if (!selectedGenre) return;
+    fetchMovies(selectedGenre.id);
+  }, [selectedGenre, refreshKey]);
 
   const handleBack = () => {
     setSelectedGenre(null);
     setMovies([]);
     setError(null);
   };
+
+  const handleRefresh = () => setRefreshKey((k) => k + 1);
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,9 +85,19 @@ export default function Recommendations() {
                   {selectedGenre.name}
                 </h1>
                 <p className="text-on-surface-variant text-[14px]">
-                  Top rated {selectedGenre.name.toLowerCase()} movies
+                  Discovering {selectedGenre.name.toLowerCase()} movies
                 </p>
               </div>
+              <button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                title="Shuffle"
+              >
+                <span className={`material-symbols-outlined text-on-surface ${loading ? 'animate-spin' : ''}`}>
+                  shuffle
+                </span>
+              </button>
             </div>
           ) : (
             <div>
@@ -88,7 +105,7 @@ export default function Recommendations() {
                 Recommendations
               </h1>
               <p className="text-on-surface-variant text-[16px]">
-                Pick a genre to discover top rated films
+                Pick a genre to discover movies
               </p>
             </div>
           )}

@@ -605,26 +605,41 @@ export async function getPersonMovieCredits(personId) {
   return { cast };
 }
 
-export async function getMoviesByGenre(genreId, page = 1) {
+function shuffleArray(arr) {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+const DISCOVER_SORT_OPTIONS = [
+  'popularity.desc',
+  'vote_average.desc',
+  'primary_release_date.desc',
+  'vote_count.desc',
+  'revenue.desc',
+];
+
+export async function getMoviesByGenre(genreId) {
   if (!TMDB_API_KEY) {
     await new Promise((r) => setTimeout(r, 500));
     const filtered = MOCK_MOVIES.filter((m) => m.genre_ids?.includes(genreId));
     const pool = filtered.length > 0 ? filtered : MOCK_MOVIES;
-    const results = [];
-    for (let i = 0; i < 20; i++) {
-      const base = pool[i % pool.length];
-      results.push({ ...base, id: base.id + i + (filtered.length > 0 ? 0 : 1000000) });
-    }
+    const results = shuffleArray(pool).slice(0, 20);
     return { results, total_results: results.length, total_pages: 1 };
   }
+  const sortBy = DISCOVER_SORT_OPTIONS[Math.floor(Math.random() * DISCOVER_SORT_OPTIONS.length)];
+  const page = Math.floor(Math.random() * 5) + 1;
   const data = await fetchTMDB('/discover/movie', {
     with_genres: genreId,
-    sort_by: 'vote_average.desc',
-    'vote_count.gte': '500',
+    sort_by: sortBy,
+    'vote_count.gte': '100',
     page,
   });
   return {
-    results: data.results,
+    results: shuffleArray(data.results),
     total_results: data.total_results,
     total_pages: data.total_pages,
   };
