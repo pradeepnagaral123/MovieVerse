@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Landing from './pages/Landing';
 import HomeFeed from './pages/HomeFeed';
 import FilmDetail from './pages/FilmDetail';
 import MovieDetail from './pages/MovieDetail';
@@ -17,7 +18,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomeFeed />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/home" element={<HomeFeed />} />
         <Route path="/tv" element={<TVShows />} />
         <Route path="/tv/search" element={<TVSearchResults />} />
         <Route path="/tv/:id" element={<ShowDetail />} />

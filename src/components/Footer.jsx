@@ -24,7 +24,7 @@ export default function Footer() {
             </h5>
             <ul className="space-y-2 text-on-surface-variant text-[16px]">
               <li>
-                <Link className="hover:text-primary-container transition-colors" to="/" onClick={scrollToTop}>Movies</Link>
+                <Link className="hover:text-primary-container transition-colors" to="/home" onClick={scrollToTop}>Movies</Link>
               </li>
               <li>
                 <Link className="hover:text-primary-container transition-colors" to="/tv" onClick={scrollToTop}>TV Shows</Link>

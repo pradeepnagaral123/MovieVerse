@@ -168,7 +168,7 @@ export default function MovieDetail() {
         <h2 className="text-[24px] font-bold text-on-surface mb-2">Movie not found</h2>
         <p className="text-on-surface-variant text-[16px] mb-6">{error || 'Something went wrong.'}</p>
         <Link
-          to="/"
+          to="/home"
           className="px-6 py-3 bg-primary-container text-on-primary-container font-bold rounded-lg hover:scale-105 transition-transform"
         >
           Back to Home

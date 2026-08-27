@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 
 const sidebarLinks = [
-  { icon: 'dynamic_feed', label: 'Feed', href: '/' },
+  { icon: 'dynamic_feed', label: 'Feed', href: '/home' },
   { icon: 'group', label: 'Friends', href: '/friends' },
   { icon: 'history', label: 'Activity', href: '/activity' },
   { icon: 'format_list_bulleted', label: 'Lists', href: '/lists' },

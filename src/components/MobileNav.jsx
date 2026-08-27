@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 
 const navItems = [
-  { label: 'Movies', href: '/', icon: 'movie' },
+  { label: 'Movies', href: '/home', icon: 'movie' },
   { label: 'TV', href: '/tv', icon: 'tv' },
   { label: 'Discover', href: '/recommendations', icon: 'explore' },
   { label: 'Watchlist', href: '/watchlist', icon: 'bookmark' },
@@ -12,7 +12,7 @@ export default function MobileNav() {
   const location = useLocation();
 
   const isActive = (href) => {
-    if (href === '/') return location.pathname === '/';
+    if (href === '/home') return location.pathname === '/home';
     return location.pathname.startsWith(href);
   };
 

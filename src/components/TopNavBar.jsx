@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const navLinks = [
-  { label: 'Movies', href: '/', icon: 'movie' },
+  { label: 'Movies', href: '/home', icon: 'movie' },
   { label: 'TV Shows', href: '/tv', icon: 'tv' },
   { label: 'Recommendations', href: '/recommendations', icon: 'explore' },
   { label: 'Watchlist', href: '/watchlist', icon: 'bookmark' },
@@ -52,7 +52,7 @@ export default function TopNavBar({ activeLink = 'Movies' }) {
             >
               <span className="material-symbols-outlined text-[28px]">menu</span>
             </button>
-            <Link to="/" className="text-[28px] md:text-[48px] font-black text-primary-container tracking-tighter leading-none">
+            <Link to="/home" className="text-[28px] md:text-[48px] font-black text-primary-container tracking-tighter leading-none">
               CineVerse
             </Link>
           </div>
