@@ -1,33 +1,37 @@
 import { useState, useEffect } from 'react';
 import AuthModal from '../components/AuthModal';
-import { getTrendingMovies, getPopularMovies, getTopRatedMovies, getUpcomingMovies, backdropUrl, posterUrl } from '../services/tmdb';
-
-const heroFallback = {
-  backdrop_path: null,
-  title: 'MovieVerse',
-  overview: 'Discover your next cinematic obsession.',
-};
+import { getTrendingMovies, getPopularMovies, getUpcomingMovies, getNowPlayingMovies, posterUrl } from '../services/tmdb';
 
 const features = [
   {
-    icon: 'explore',
-    title: 'Vibe-Based Discovery',
-    desc: 'Search movies by mood, color palette, or a director\'s era — not just title and genre.',
+    icon: 'local_fire_department',
+    title: 'Live Movie Feed',
+    desc: 'Real-time trending, popular, now-playing, and upcoming titles pulled straight from TMDB — stay on top of what the world is watching.',
   },
   {
-    icon: 'groups',
-    title: 'Film Community',
-    desc: 'Track, review, and debate the films you love with critics who breathe cinema.',
+    icon: 'explore',
+    title: 'Vibe-Based Discovery',
+    desc: 'Search by mood, genre, color palette, or a director\'s era. Our recommendation engine shuffles fresh picks so you never hit a dead end.',
+  },
+  {
+    icon: 'movie_filter',
+    title: 'Movies & TV, Deep Dives',
+    desc: 'Full detail pages with trailers, cast, crew, budget, release dates, related titles, and recommendations — for films and series alike.',
   },
   {
     icon: 'bookmark',
     title: 'Smart Watchlist',
-    desc: 'Curate watchlists, get personalized recommendations, and never miss an upcoming release.',
+    desc: 'Curate and manage watchlists, track what you\'ve seen, and get tailored suggestions across genres you actually love.',
+  },
+  {
+    icon: 'groups',
+    title: 'Film Community',
+    desc: 'Track, review, and debate the films you love. Profiles, community feeds, and collabs with critics who breathe cinema.',
   },
   {
     icon: 'ballot',
-    title: 'Community Polls',
-    desc: 'Vote on the hottest debates — from best endings to most rewatchable scenes.',
+    title: 'Community Polls & Debates',
+    desc: 'Vote on the hottest debates — from best endings to most rewatchable scenes — and see where your taste lines up.',
   },
 ];
 
@@ -58,28 +62,48 @@ const testimonials = [
 
 const genrePills = ['Sci-Fi', 'Drama', 'Thriller', 'Animation', 'Romance', 'Crime', 'Horror', 'Comedy'];
 
+const POSTER_LAYOUT = [
+  'col-span-2 row-span-3',
+  'col-span-2 row-span-2',
+  'col-span-2 row-span-3',
+  'col-span-2 row-span-2',
+  'col-span-2 row-span-3',
+  'col-span-2 row-span-2',
+  'col-span-2 row-span-3',
+  'col-span-2 row-span-2',
+  'col-span-4 row-span-2',
+  'col-span-2 row-span-2',
+  'col-span-2 row-span-3',
+  'col-span-2 row-span-3',
+  'col-span-2 row-span-2',
+  'col-span-2 row-span-3',
+  'col-span-2 row-span-2',
+  'col-span-2 row-span-3',
+  'col-span-2 row-span-2',
+  'col-span-2 row-span-3',
+];
+
 export default function Landing() {
   const [authOpen, setAuthOpen] = useState(false);
   const [heroMovies, setHeroMovies] = useState([]);
   const [popular, setPopular] = useState([]);
-  const [topRated, setTopRated] = useState([]);
   const [upcoming, setUpcoming] = useState([]);
-  const [heroIndex, setHeroIndex] = useState(0);
+  const [nowPlaying, setNowPlaying] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [trendingData, popularData, topRatedData, upcomingData] = await Promise.all([
+        const [trendingData, popularData, upcomingData, nowPlayingData] = await Promise.all([
           getTrendingMovies('week'),
           getPopularMovies(),
-          getTopRatedMovies(),
           getUpcomingMovies(),
+          getNowPlayingMovies(),
         ]);
-        setHeroMovies(trendingData.results.filter((m) => m.backdrop_path).slice(0, 8));
+        setHeroMovies(trendingData.results.filter((m) => m.poster_path).slice(0, 8));
         setPopular(popularData.results);
-        setTopRated(topRatedData.results);
         setUpcoming(upcomingData.results);
+        setNowPlaying(nowPlayingData.results);
       } catch (err) {
         console.error('Failed to fetch landing data:', err);
       } finally {
@@ -89,34 +113,23 @@ export default function Landing() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (heroMovies.length < 2) return;
-    const timer = setInterval(() => {
-      setHeroIndex((prev) => (prev + 1) % heroMovies.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [heroMovies.length]);
-
-  const active = heroMovies[heroIndex] || heroFallback;
-  const heroImg = active.backdrop_path ? backdropUrl(active.backdrop_path, 'original') : null;
-
   return (
     <div className="min-h-screen bg-background text-on-surface">
-      {/* Hero with animated background */}
+      {/* Hero */}
       <section className="relative min-h-screen flex flex-col overflow-hidden">
-        {/* Background image crossfade */}
+        {/* Background: irregular grid of movie posters */}
         <div className="absolute inset-0">
-          {heroImg && (
-            <img
-              key={active.id || 'fallback'}
-              className="w-full h-full object-cover opacity-90 animate-slide-up"
-              src={heroImg}
-              alt={active.title || ''}
-            />
-          )}
-          <div className="absolute inset-0 bg-background/45" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-transparent to-background" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-background" />
+          <div className="grid grid-cols-4 md:grid-cols-6 grid-rows-6 gap-1 h-full">
+            {[...popular, ...nowPlaying, ...heroMovies]
+              .filter((m) => m && m.poster_path)
+              .slice(0, 18)
+              .map((movie, i) => (
+                <PosterTile key={movie.id} movie={movie} grid layout={POSTER_LAYOUT[i % POSTER_LAYOUT.length]} />
+              ))}
+          </div>
+          <div className="absolute inset-0 bg-background/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/20 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-background/10" />
         </div>
 
         {/* Nav */}
@@ -135,13 +148,13 @@ export default function Landing() {
         </header>
 
         {/* Hero content */}
-        <div className="relative z-10 flex-1 flex items-center justify-center px-4 pt-32 pb-20 md:pt-40 md:pb-28 text-center">
+        <div className="relative z-10 flex-1 flex items-center justify-center px-4 pt-32 pb-16 md:pt-40 md:pb-20 text-center">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-high border border-white/10 text-on-surface-variant text-[12px] tracking-[0.1em] uppercase font-medium mb-8">
               <span className="material-symbols-outlined text-secondary text-[16px]">local_fire_department</span>
               Built for those who breathe cinema
             </span>
-            <h1 className="text-[40px] md:text-[64px] leading-[1.05] font-black tracking-tight mb-6">
+            <h1 className="text-[44px] md:text-[64px] leading-[1.05] font-black tracking-tight mb-6">
               Find your next{' '}
               <span className="text-primary-container">obsession</span>.
             </h1>
@@ -163,35 +176,6 @@ export default function Landing() {
                 Explore
               </a>
             </div>
-
-            {/* Hero movie caption */}
-            {active.title && heroImg && (
-              <div className="mt-12">
-                <div className="flex items-center justify-center gap-4 text-[13px] text-on-surface-variant">
-                  <span className="font-bold text-primary-container tracking-[0.2em] uppercase">Now Trending</span>
-                  <span className="w-8 h-px bg-white/20" />
-                  <span className="font-bold text-on-surface">{active.title}</span>
-                  {active.vote_average > 0 && (
-                    <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-secondary text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                      {active.vote_average.toFixed(1)}
-                    </span>
-                  )}
-                </div>
-                <div className="flex justify-center gap-2 mt-4">
-                  {heroMovies.map((m, i) => (
-                    <button
-                      key={m.id}
-                      onClick={() => setHeroIndex(i)}
-                      aria-label={m.title}
-                      className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                        i === heroIndex ? 'w-8 bg-primary-container' : 'w-3 bg-white/20 hover:bg-white/40'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </section>
@@ -229,28 +213,6 @@ export default function Landing() {
                 ))
               : heroMovies.concat(heroMovies).slice(0, 10).map((movie) => (
                   <FeaturedPoster key={movie.id} movie={movie} />
-                ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Top Rated */}
-      <section className="px-4 md:px-12 py-10 relative z-10">
-        <div className="max-w-[1280px] mx-auto">
-          <h2 className="text-[28px] md:text-[40px] font-black tracking-tight mb-8">
-            Critics' <span className="text-primary-container">Favorites</span>
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
-            {loading
-              ? Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="rounded-2xl overflow-hidden bg-surface-container-high animate-pulse">
-                    <div className="aspect-[2/3] bg-surface-container-highest" />
-                  </div>
-                ))
-              : topRated.slice(0, 5).map((movie, i) => (
-                  <div key={movie.id} className="relative rounded-2xl overflow-hidden group cursor-pointer">
-                    <FeaturedPoster movie={movie} rank={i + 1} />
-                  </div>
                 ))}
           </div>
         </div>
@@ -304,19 +266,22 @@ export default function Landing() {
       <section id="features" className="px-4 md:px-12 py-20 relative z-10">
         <div className="max-w-[1280px] mx-auto">
           <h2 className="text-[28px] md:text-[44px] font-black tracking-tight text-center mb-4">
-            Why <span className="text-primary-container">CineVerse</span>?
+            What <span className="text-primary-container">CineVerse</span> does
           </h2>
-          <p className="text-on-surface-variant text-center text-[18px] mb-12 max-w-xl mx-auto">
-            Everything you need to track, discover, and debate film — in one place.
+          <p className="text-on-surface-variant text-center text-[18px] mb-12 max-w-2xl mx-auto">
+            A complete movie & TV platform built on live TMDB data — discover, track, deep-dive,
+            and debate everything cinema.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f) => (
-              <div key={f.title} className="glass-card rounded-2xl p-6">
-                <div className="w-12 h-12 rounded-xl bg-primary-container/15 flex items-center justify-center mb-4">
+              <div key={f.title} className="glass-card rounded-2xl p-7 flex gap-4">
+                <div className="w-12 h-12 rounded-xl bg-primary-container/15 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-primary-container text-[26px]">{f.icon}</span>
                 </div>
-                <h3 className="text-[18px] font-bold mb-2">{f.title}</h3>
-                <p className="text-on-surface-variant text-[14px] leading-relaxed">{f.desc}</p>
+                <div>
+                  <h3 className="text-[18px] font-bold mb-2">{f.title}</h3>
+                  <p className="text-on-surface-variant text-[14px] leading-relaxed">{f.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -474,6 +439,47 @@ function MiniPoster({ movie }) {
       <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <div className="text-[12px] font-bold text-on-surface line-clamp-1">{movie.title || ''}</div>
       </div>
+    </div>
+  );
+}
+
+function PosterTile({ movie, className, grid, layout }) {
+  const [imgError, setImgError] = useState(false);
+  const poster = posterUrl(movie.poster_path, 'w342');
+
+  if (grid) {
+    return (
+      <div className={`relative h-full w-full overflow-hidden ${layout || ''} ${className || ''}`}>
+        {!imgError && poster ? (
+          <img
+            className="w-full h-full object-cover"
+            src={poster}
+            alt={movie.title || ''}
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+            <span className="material-symbols-outlined text-4xl text-on-surface-variant">movie</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border border-white/15 ${className}`}>
+      {!imgError && poster ? (
+        <img
+          className="w-full h-full object-cover"
+          src={poster}
+          alt={movie.title || ''}
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+          <span className="material-symbols-outlined text-4xl text-on-surface-variant">movie</span>
+        </div>
+      )}
     </div>
   );
 }
