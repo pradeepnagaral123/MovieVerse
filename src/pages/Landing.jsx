@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import AuthModal from '../components/AuthModal';
 import { getTrendingMovies, getPopularMovies, getUpcomingMovies, getNowPlayingMovies, getMovieDetails, posterUrl, backdropUrl } from '../services/tmdb';
 
@@ -10,8 +9,6 @@ const features = [
     tagline: 'A living marquee — trends, hits and opening nights, updating in real time.',
     lead: 'CineVerse polls TMDB live for trending, popular, now-playing and upcoming titles. The moment a film blows up, it surfaces on your front page.',
     bullets: ['Live TMDB sync', 'Ratings & years', 'Hover previews', 'One click to deep-dive'],
-    href: '/home',
-    cta: 'Open the feed',
     snapshot: 'live-feed',
   },
   {
@@ -20,8 +17,6 @@ const features = [
     tagline: 'Search by mood, genre or a director\u2019s era — and never hit a dead end.',
     lead: 'Steer discovery by the vibe you are in. Pick a mood, shuffle the deck, and the engine hands you something you did not know you wanted.',
     bullets: ['Mood chips', 'Genre lanes', 'Fresh shuffle every time', 'Straight to details'],
-    href: '/recommendations',
-    cta: 'Get recommendations',
     snapshot: 'discovery',
   },
   {
@@ -30,8 +25,6 @@ const features = [
     tagline: 'Trailers, cast, budget, release dates — every rabbit hole, on one screen.',
     lead: 'Every film and series gets the full encyclopaedia treatment: hero banners, ratings, cast grids, streaming options and related titles.',
     bullets: ['Immersive hero', 'Full cast & crew', 'Trailers & budget', 'Related titles'],
-    href: '/film/inception',
-    cta: 'See a deep dive',
     snapshot: 'deep-dives',
   },
   {
@@ -40,8 +33,6 @@ const features = [
     tagline: 'Curate your queue, track what you\u2019ve seen, and remember it all.',
     lead: 'One tap bookmarks any film or show. Queues are saved on your device, favorites feed your profile, and your taste shapes recommendations.',
     bullets: ['One-tap save', 'Separate movie & show queues', 'Persists across visits', 'Favorites feed your profile'],
-    href: '/watchlist',
-    cta: 'Manage watchlist',
     snapshot: 'watchlist',
   },
   {
@@ -50,8 +41,6 @@ const features = [
     tagline: 'Track, review and debate the films you love with people who breathe cinema.',
     lead: 'A social layer for cinephiles: logs, reviews and hot takes stream in, and every deep-dive collects the discussion right below the film.',
     bullets: ['Shared community feed', 'Star-rating system', 'Review walls', 'Profiles driven by taste'],
-    href: '/community',
-    cta: 'Join the community',
     snapshot: 'community',
   },
   {
@@ -60,8 +49,6 @@ const features = [
     tagline: 'Vote on best endings, most rewatchable scenes, and the debates that matter.',
     lead: 'Cast your vote, watch tallies move in real time, and see exactly where your taste lines up against the rest of the community.',
     bullets: ['Live voting', 'Instant tallies', 'Taste comparisons', 'Cross-linked to the community'],
-    href: '/community/polls',
-    cta: 'Vote in a poll',
     snapshot: 'polls',
   },
 ];
@@ -297,7 +284,7 @@ export default function Landing() {
           </div>
           <div className="space-y-[7vh]">
             {features.map((f, i) => (
-              <FeatureSection key={f.title} feature={f} index={i} />
+              <FeatureSection key={f.title} feature={f} index={i} onOpenAuth={() => setAuthOpen(true)} />
             ))}
           </div>
         </div>
@@ -481,7 +468,7 @@ function PosterTile({ movie, className, aspectClass = 'aspect-[2/3]' }) {
   );
 }
 
-function FeatureSection({ feature, index }) {
+function FeatureSection({ feature, index, onOpenAuth }) {
   return (
     <section
       id={`feature-section-${index}`}
@@ -517,13 +504,13 @@ function FeatureSection({ feature, index }) {
               </span>
             ))}
           </div>
-          <Link
-            to={feature.href}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-container text-on-primary-container rounded-full font-black text-[14px] hover:brightness-110 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,128,0,0.3)]"
+          <button
+            onClick={onOpenAuth}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-container text-on-primary-container rounded-full font-black text-[14px] hover:brightness-110 active:scale-95 transition-all shadow-[0_0_20px_rgba(255,128,0,0.3)] cursor-pointer"
           >
-            {feature.cta}
+            Sign up to try it
             <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-          </Link>
+          </button>
         </div>
 
         {/* Snapshot */}
@@ -702,13 +689,6 @@ function DeepDiveSnapshot() {
             <span className="text-on-surface-variant">{movie.release_date?.split('-')[0]}</span>
           </div>
         </div>
-        <Link
-          to="/film/inception"
-          className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-primary-container text-on-primary-container rounded-full font-black text-[13px] hover:brightness-110 transition-all"
-        >
-          <span className="material-symbols-outlined text-[16px]">play_arrow</span>
-          Watch trailer
-        </Link>
       </div>
     </div>
   );
@@ -768,12 +748,9 @@ function WatchlistSnapshot() {
         <div className="flex flex-col items-center justify-center py-10 text-center">
           <span className="material-symbols-outlined text-on-surface-variant text-[38px] mb-3">bookmark_add</span>
           <p className="text-[14px] text-on-surface-variant mb-4">Bookmark a movie or show and it will appear here instantly.</p>
-          <Link
-            to="/home"
-            className="px-5 py-2.5 bg-primary-container text-on-primary-container rounded-full text-[13px] font-black hover:brightness-110 transition-all"
-          >
-            Browse and save
-          </Link>
+          <span className="px-5 py-2.5 bg-surface-container-high border border-white/10 text-on-surface-variant rounded-full text-[13px] font-black">
+            Sign in to start saving
+          </span>
         </div>
       )}
     </div>
@@ -823,7 +800,6 @@ function CommunitySnapshot() {
             <div className="flex items-center gap-4 mt-3 text-[12px] text-on-surface-variant font-bold">
               <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[15px]">thumb_up</span> 128</span>
               <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[15px]">forum</span> 34</span>
-              <Link to="/community" className="text-primary-container hover:underline">Join the debate</Link>
             </div>
           </div>
         ))}
@@ -881,7 +857,6 @@ function PollsSnapshot() {
         <p className="text-on-surface-variant text-[12px]">
           {voted != null ? `Thanks for voting! You chose: ${pollOptions[voted].label}` : 'Tap an option to cast your vote.'}
         </p>
-        <Link to="/community/polls" className="text-primary-container text-[13px] font-bold hover:underline">All polls →</Link>
       </div>
     </div>
   );
