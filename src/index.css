@@ -173,6 +173,22 @@ body {
   display: none;
 }
 
+.vertical-marquee-track {
+  animation: vertical-marquee-scroll 70s linear infinite;
+}
+.vertical-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes vertical-marquee-scroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
 .radar-grid {
   background-image: radial-gradient(circle, rgba(255, 183, 135, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
