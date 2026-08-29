@@ -142,7 +142,7 @@ export default function Landing() {
         </div>
 
         {/* Nav */}
-        <header className="fixed top-0 w-full z-50 border-b border-white/10 bg-surface/80 backdrop-blur-xl">
+        <header className="fixed top-0 w-full z-50 bg-transparent">
           <div className="flex justify-between items-center px-4 md:px-12 h-16 md:h-20 max-w-[1280px] mx-auto">
             <span className="text-[28px] md:text-[48px] font-black text-primary-container tracking-tighter leading-none">
               CineVerse
