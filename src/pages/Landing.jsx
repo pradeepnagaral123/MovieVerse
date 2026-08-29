@@ -136,9 +136,9 @@ export default function Landing() {
               ))}
             </div>
           </div>
-          <div className="absolute inset-0 bg-background/40" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/20 to-background" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-background/10" />
+          <div className="absolute inset-0 bg-background/15" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/35 via-background/10 to-background/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/55 via-background/5 to-transparent" />
         </div>
 
         {/* Nav */}
