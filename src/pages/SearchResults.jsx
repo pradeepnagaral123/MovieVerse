@@ -83,7 +83,7 @@ export default function SearchResults() {
           <div className="mb-6 p-4 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center gap-3">
             <span className="material-symbols-outlined text-primary-container">info</span>
             <p className="text-on-surface text-[14px]">
-              <span className="font-bold text-primary-container">Demo Mode</span> — Showing sample movies. To search real movies, add your OMDB API key to <code className="bg-white/10 px-2 py-0.5 rounded text-[12px]">.env</code>
+              <span className="font-bold text-primary-container">Demo Mode</span> — Showing sample movies. To search real movies, add your TMDB API key to <code className="bg-white/10 px-2 py-0.5 rounded text-[12px]">.env</code>
             </p>
           </div>
         )}
