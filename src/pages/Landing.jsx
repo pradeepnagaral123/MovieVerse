@@ -164,12 +164,11 @@ export default function Landing() {
               Built for those who breathe cinema
             </span>
             <h1 className="text-[44px] md:text-[64px] leading-[1.05] font-black tracking-tight mb-6">
-              Find your next{' '}
-              <span className="text-primary-container">obsession</span>.
+              Your next favorite movie is{' '}
+              <span className="text-primary-container">one mood</span> away.
             </h1>
             <p className="text-on-surface-variant text-[18px] md:text-[22px] leading-relaxed max-w-xl mx-auto mb-10">
-              CineVerse is a mood-driven movie tracker and community — discover films by vibe,
-              track what you watch, and debate with critics.
+              Discover films based on how you feel, track every watch, and find people who obsess over movies just like you.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
