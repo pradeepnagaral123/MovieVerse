@@ -112,21 +112,25 @@ export default function Landing() {
     fetchData();
   }, []);
 
-  const heroFilms = [...popular, ...nowPlaying, ...heroMovies, ...upcoming].filter((m) => m && m.poster_path).slice(0, 30);
+  const heroFilms = [...new Map(
+    [...popular, ...nowPlaying, ...heroMovies, ...upcoming]
+      .filter((m) => m && m.poster_path)
+      .map((m) => [m.id, m])
+  ).values()].slice(0, 30);
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
       {/* Hero */}
       <section className="relative min-h-screen flex flex-col overflow-hidden">
-        {/* Background: masonry wall of 30 posters, slowly drifting upward */}
+        {/* Background: masonry wall of posters, slowly drifting horizontally */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="vertical-marquee-track">
-            <div className="columns-3 sm:columns-4 lg:columns-5 xl:columns-6 gap-2">
+          <div className="horizontal-marquee-track">
+            <div className="w-[100vw] shrink-0 columns-3 sm:columns-4 lg:columns-5 xl:columns-6 gap-2">
               {heroFilms.map((movie, i) => (
                 <PosterTile key={`${movie.id}-a`} movie={movie} aspectClass={POSTER_SIZES[i % POSTER_SIZES.length]} />
               ))}
             </div>
-            <div className="columns-3 sm:columns-4 lg:columns-5 xl:columns-6 gap-2">
+            <div className="w-[100vw] shrink-0 columns-3 sm:columns-4 lg:columns-5 xl:columns-6 gap-2">
               {heroFilms.map((movie, i) => (
                 <PosterTile key={`${movie.id}-b`} movie={movie} aspectClass={POSTER_SIZES[i % POSTER_SIZES.length]} />
               ))}

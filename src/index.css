@@ -173,19 +173,21 @@ body {
   display: none;
 }
 
-.vertical-marquee-track {
-  animation: vertical-marquee-scroll 70s linear infinite;
+.horizontal-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: horizontal-marquee-scroll 90s linear infinite;
 }
-.vertical-marquee-track:hover {
+.horizontal-marquee-track:hover {
   animation-play-state: paused;
 }
 
-@keyframes vertical-marquee-scroll {
+@keyframes horizontal-marquee-scroll {
   from {
-    transform: translateY(0);
+    transform: translateX(0);
   }
   to {
-    transform: translateY(-50%);
+    transform: translateX(-50%);
   }
 }
 
