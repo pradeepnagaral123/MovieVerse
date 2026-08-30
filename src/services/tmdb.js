@@ -550,7 +550,6 @@ export async function getAnticipatedMovies() {
   const [world, indian] = await Promise.all([
     fetchTMDB('/discover/movie', {
       ...common,
-      'vote_count.gte': '20',
       'with_release_type': '2|3',
     }),
     fetchTMDB('/discover/movie', {
@@ -571,7 +570,16 @@ export async function getAnticipatedMovies() {
     seen.set(m.id, { ...m, region: isIndianOrigin(m) ? 'IN' : 'INTL' });
   });
 
-  const results = [...seen.values()].sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+  const merged = [...seen.values()].sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+  const worldFilms = merged.filter((m) => m.region !== 'IN');
+  const indiaFilms = merged.filter((m) => m.region === 'IN');
+
+  const results = [];
+  const maxLen = Math.max(worldFilms.length, indiaFilms.length);
+  for (let i = 0; i < maxLen; i++) {
+    if (worldFilms[i]) results.push(worldFilms[i]);
+    if (indiaFilms[i]) results.push(indiaFilms[i]);
+  }
   return { results, total_results: results.length, total_pages: 1 };
 }
 

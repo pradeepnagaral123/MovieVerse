@@ -485,7 +485,6 @@ function ComingSoonCard({ movie }) {
       <div className="absolute top-2 right-2 flex gap-1.5">
         {isIndia ? (
           <span className="px-2 py-0.5 rounded-full bg-primary-container/90 text-on-primary-container text-[10px] font-black tracking-wider uppercase flex items-center gap-1">
-            <span className="material-symbols-outlined text-[12px]">south_asia</span>
             India
           </span>
         ) : (
