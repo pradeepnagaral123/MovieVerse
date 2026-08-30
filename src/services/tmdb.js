@@ -34,6 +34,24 @@ export const imageUrl = (path, size = 'w500') => {
 
 export const isTmdbKeySet = () => TMDB_API_KEY && TMDB_API_KEY.length > 5;
 
+const INDIAN_LANGUAGES = new Set(['hi', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'pa', 'gu', 'ur', 'or', 'as', 'sa']);
+
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function yearFromNowISO() {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+export function isIndianOrigin(movie) {
+  if (!movie) return false;
+  if ((movie.origin_country || []).includes('IN')) return true;
+  return INDIAN_LANGUAGES.has(movie.original_language);
+}
+
 const TV_GENRES = {
   10759: 'Action & Adventure',
   16: 'Animation',
@@ -498,16 +516,63 @@ export async function searchMovies(query, page = 1) {
 }
 
 export async function getUpcomingMovies(page = 1) {
+  const today = todayISO();
   if (!TMDB_API_KEY) {
     await new Promise((r) => setTimeout(r, 500));
-    return { results: MOCK_MOVIES.slice(3, 9) };
+    return { results: [], total_results: 0, total_pages: 0 };
   }
-  const data = await fetchTMDB('/movie/upcoming', { page });
+  const data = await fetchTMDB('/movie/upcoming', { page, region: 'US' });
+  const results = (data.results || []).filter(
+    (m) => m && m.release_date && m.release_date >= today && m.poster_path
+  );
   return {
-    results: data.results,
-    total_results: data.total_results,
+    results,
+    total_results: results.length,
     total_pages: data.total_pages,
   };
+}
+
+export async function getAnticipatedMovies() {
+  const today = todayISO();
+  const horizon = yearFromNowISO();
+  if (!TMDB_API_KEY) {
+    await new Promise((r) => setTimeout(r, 600));
+    return { results: [], total_results: 0, total_pages: 0 };
+  }
+
+  const common = {
+    'primary_release_date.gte': today,
+    'primary_release_date.lte': horizon,
+    sort_by: 'popularity.desc',
+    page: 1,
+  };
+
+  const [world, indian] = await Promise.all([
+    fetchTMDB('/discover/movie', {
+      ...common,
+      'vote_count.gte': '20',
+      'with_release_type': '2|3',
+    }),
+    fetchTMDB('/discover/movie', {
+      ...common,
+      'with_origin_country': 'IN',
+      'with_release_type': '2|3',
+    }),
+  ]);
+
+  const seen = new Map();
+  [...(indian.results || []), ...(world.results || [])].forEach((m) => {
+    if (!m || !m.poster_path || !m.release_date || m.release_date < today) return;
+    const carrying = seen.get(m.id);
+    if (carrying) {
+      if (isIndianOrigin(m)) carrying.region = 'IN';
+      return;
+    }
+    seen.set(m.id, { ...m, region: isIndianOrigin(m) ? 'IN' : 'INTL' });
+  });
+
+  const results = [...seen.values()].sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+  return { results, total_results: results.length, total_pages: 1 };
 }
 
 export async function getNowPlayingMovies(page = 1) {

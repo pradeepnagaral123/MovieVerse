@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AuthModal from '../components/AuthModal';
-import { getTrendingMovies, getPopularMovies, getUpcomingMovies, getNowPlayingMovies, getMovieDetails, posterUrl, backdropUrl } from '../services/tmdb';
+import { getTrendingMovies, getPopularMovies, getAnticipatedMovies, getNowPlayingMovies, getMovieDetails, posterUrl, backdropUrl } from '../services/tmdb';
 
 const features = [
   {
@@ -103,7 +103,7 @@ export default function Landing() {
         const [trendingData, popularData, upcomingData, nowPlayingData] = await Promise.all([
           getTrendingMovies('week'),
           getPopularMovies(),
-          getUpcomingMovies(),
+          getAnticipatedMovies(),
           getNowPlayingMovies(),
         ]);
         setHeroMovies(trendingData.results.filter((m) => m.poster_path));
@@ -255,22 +255,15 @@ export default function Landing() {
       {upcoming.length > 0 && !loading && (
         <section className="px-4 md:px-12 py-10 relative z-10">
           <div className="max-w-[1280px] mx-auto">
-            <h2 className="text-[24px] md:text-[32px] font-black tracking-tight mb-8">
+            <h2 className="text-[24px] md:text-[32px] font-black tracking-tight mb-2">
               Coming <span className="text-primary-container">Soon</span>
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {upcoming.slice(0, 4).map((movie) => (
-                <div key={movie.id} className="glass-card rounded-2xl p-5">
-                  <div className="text-[12px] text-on-surface-variant tracking-[0.1em] uppercase font-medium mb-1">
-                    {movie.release_date ? new Date(movie.release_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Date TBA'}
-                  </div>
-                  <h3 className="font-bold text-[16px] leading-snug group-hover:text-primary-container transition-colors">
-                    {movie.title}
-                  </h3>
-                  {movie.overview && (
-                    <p className="text-on-surface-variant text-[13px] mt-2 line-clamp-2">{movie.overview}</p>
-                  )}
-                </div>
+            <p className="text-on-surface-variant text-[14px] md:text-[15px] mb-8">
+              The most anticipated releases across Indian &amp; world cinema — dates live from TMDB.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {upcoming.slice(0, 8).map((movie) => (
+                <ComingSoonCard key={movie.id} movie={movie} />
               ))}
             </div>
           </div>
@@ -456,6 +449,60 @@ function MiniPoster({ movie }) {
       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <div className="text-[12px] font-bold text-on-surface line-clamp-1">{movie.title || ''}</div>
+      </div>
+    </div>
+  );
+}
+
+function formatReleaseDate(releaseDate) {
+  if (!releaseDate) return 'Date TBA';
+  const [y, m, d] = releaseDate.split('-').map(Number);
+  if (!y || !m || !d) return 'Date TBA';
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function ComingSoonCard({ movie }) {
+  const [imgError, setImgError] = useState(false);
+  const poster = posterUrl(movie.poster_path, 'w342');
+  const isIndia = movie.region === 'IN';
+
+  return (
+    <div className="relative rounded-2xl overflow-hidden group cursor-pointer aspect-[2/3]">
+      {!imgError && poster ? (
+        <img
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          src={poster}
+          alt={movie.title || movie.original_title || ''}
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+          <span className="material-symbols-outlined text-5xl text-on-surface-variant">movie</span>
+        </div>
+      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/10 to-transparent" />
+      <div className="absolute top-2 right-2 flex gap-1.5">
+        {isIndia ? (
+          <span className="px-2 py-0.5 rounded-full bg-primary-container/90 text-on-primary-container text-[10px] font-black tracking-wider uppercase flex items-center gap-1">
+            <span className="material-symbols-outlined text-[12px]">south_asia</span>
+            India
+          </span>
+        ) : (
+          <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm text-on-surface text-[10px] font-black tracking-wider uppercase flex items-center gap-1">
+            <span className="material-symbols-outlined text-[12px] text-secondary">public</span>
+            World
+          </span>
+        )}
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 p-3">
+        <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-black/70 backdrop-blur-sm text-primary-container text-[11px] font-black">
+          <span className="material-symbols-outlined text-[13px]">event</span>
+          {formatReleaseDate(movie.release_date)}
+        </div>
+        <h4 className="text-on-surface font-bold text-[13px] group-hover:text-primary-container transition-colors line-clamp-2 mt-1.5">
+          {movie.title || movie.original_title || ''}
+        </h4>
       </div>
     </div>
   );
