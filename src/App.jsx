@@ -13,6 +13,8 @@ import SearchResults from './pages/SearchResults';
 import Community from './pages/Community';
 import Polls from './pages/Polls';
 import Recommendations from './pages/Recommendations';
+import Lists from './pages/Lists';
+import ListDetail from './pages/ListDetail';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
         <Route path="/community" element={<Community />} />
         <Route path="/community/polls" element={<Polls />} />
         <Route path="/recommendations" element={<Recommendations />} />
+        <Route path="/lists" element={<Lists />} />
+        <Route path="/lists/:slug" element={<ListDetail />} />
       </Routes>
     </Router>
   );
