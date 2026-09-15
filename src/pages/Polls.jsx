@@ -321,16 +321,16 @@ export default function Polls() {
           <div className="flex-1 space-y-12">
             {/* Hero Section: Poll of the Day */}
             <section>
-              <div className="flex items-end justify-between mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
                 <div>
                   <span className="bg-primary-container/20 text-primary-container px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tighter mb-3 inline-block">
                     Poll of the Day
                   </span>
-                  <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-on-surface">
+                  <h1 className="text-2xl min-[400px]:text-3xl md:text-5xl font-extrabold tracking-tight text-on-surface">
                     Who is the ultimate cinematic villain?
                   </h1>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right shrink-0">
                   <p className="text-on-surface-variant text-sm">24,582 votes cast</p>
                   <p className="text-primary text-xs font-mono">
                     Ends in {pad(timeLeft.h)}:{pad(timeLeft.m)}:{pad(timeLeft.s)}

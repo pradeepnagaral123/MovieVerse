@@ -8,6 +8,12 @@ const navLinks = [
   { label: 'Watchlist', href: '/watchlist', icon: 'bookmark' },
 ];
 
+const extraLinks = [
+  { label: 'Lists', href: '/lists', icon: 'format_list_bulleted' },
+  { label: 'Polls', href: '/polls', icon: 'ballot' },
+  { label: 'Community', href: '/community', icon: 'groups' },
+];
+
 export default function TopNavBar({ activeLink = 'Movies' }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -44,15 +50,19 @@ export default function TopNavBar({ activeLink = 'Movies' }) {
             : 'h-20 bg-surface/80 backdrop-blur-xl'
         }`}
       >
-        <div className="flex justify-between items-center px-4 md:px-12 h-full max-w-[1280px] mx-auto">
-          <div className="flex items-center gap-3">
+        <div className="flex justify-between items-center gap-2 px-4 md:px-12 h-full max-w-[1280px] mx-auto">
+          <div className="flex items-center gap-1 md:gap-3 min-w-0">
             <button
               onClick={() => setMenuOpen(true)}
-              className="md:hidden p-2 -ml-2 text-on-surface-variant hover:bg-white/5 rounded-full transition-all"
+              aria-label="Open menu"
+              className="md:hidden p-2 -ml-1 text-on-surface-variant hover:bg-white/5 rounded-full transition-all shrink-0"
             >
-              <span className="material-symbols-outlined text-[28px]">menu</span>
+              <span className="material-symbols-outlined text-[26px]">menu</span>
             </button>
-            <Link to="/home" className="text-[28px] md:text-[48px] font-black text-primary-container tracking-tighter leading-none">
+            <Link
+              to="/home"
+              className="text-[24px] min-[400px]:text-[26px] sm:text-[28px] md:text-[48px] font-black text-primary-container tracking-tighter leading-none truncate"
+            >
               CineVerse
             </Link>
           </div>
@@ -71,11 +81,14 @@ export default function TopNavBar({ activeLink = 'Movies' }) {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-4">
-            <button className="p-2 text-on-surface-variant hover:bg-white/5 rounded-full transition-all">
+          <div className="flex items-center gap-1 md:gap-4 shrink-0">
+            <button
+              aria-label="Notifications"
+              className="hidden min-[380px]:flex p-2 text-on-surface-variant hover:bg-white/5 rounded-full transition-all"
+            >
               <span className="material-symbols-outlined">notifications</span>
             </button>
-            <Link to="/profile" className={`w-10 h-10 rounded-full overflow-hidden transition-all ${isProfile ? 'border-2 border-primary-container shadow-[0_0_12px_rgba(255,128,0,0.5)]' : 'border border-primary-container/30'}`}>
+            <Link to="/profile" aria-label="Profile" className={`w-10 h-10 rounded-full overflow-hidden transition-all ${isProfile ? 'border-2 border-primary-container shadow-[0_0_12px_rgba(255,128,0,0.5)]' : 'border border-primary-container/30'}`}>
               <img
                 className="w-full h-full object-cover"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW_WsP_rWwVu3IkEsdfGbq8slZ3yNuUBsk2Hkr4mkDMte4KMx03t1raztNxSpb3xdhcoFO9ol7ch_KH33YlBWR8HZQiHFvccNpFW3ouKVVBNj-phrqhJowl6oHlAbu9Bw-pcTYJdCkAqdVj9faNk1GJAnrYucnnTASc7_DyxHAPkdA_3ja1tRzFNYGCT4_dG40YGs5ukdRmMpTqS0jlL3E3FJESSoUXgD26gV2CTsSj9F9bMZSxWgh"
@@ -93,21 +106,26 @@ export default function TopNavBar({ activeLink = 'Movies' }) {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 w-72 bg-surface border-r border-white/10 shadow-2xl flex flex-col animate-slide-in">
-            <div className="flex items-center justify-between px-5 h-20 border-b border-white/10">
+          <div className="absolute inset-y-0 left-0 w-[min(82vw,20rem)] bg-surface border-r border-white/10 shadow-2xl flex flex-col animate-slide-in safe-area-bottom">
+            <div className="flex items-center justify-between px-5 h-20 border-b border-white/10 shrink-0">
               <span className="text-[24px] font-black text-primary-container tracking-tighter">
                 CineVerse
               </span>
               <button
                 onClick={() => setMenuOpen(false)}
+                aria-label="Close menu"
                 className="p-2 -mr-2 text-on-surface-variant hover:bg-white/5 rounded-full transition-all"
               >
                 <span className="material-symbols-outlined text-[28px]">close</span>
               </button>
             </div>
-            <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-              {navLinks.map((link) => {
-                const isActive = activeLink === link.label;
+            <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto overscroll-contain">
+              {[...navLinks, ...extraLinks].map((link) => {
+                const isActive =
+                  activeLink === link.label ||
+                  (link.href === '/lists' && location.pathname.startsWith('/lists')) ||
+                  (link.href === '/polls' && location.pathname.startsWith('/polls')) ||
+                  (link.href === '/community' && location.pathname.startsWith('/community'));
                 return (
                   <Link
                     key={link.label}
@@ -129,10 +147,10 @@ export default function TopNavBar({ activeLink = 'Movies' }) {
                 );
               })}
             </nav>
-            <div className="px-5 py-5 border-t border-white/10">
+            <div className="px-5 py-5 border-t border-white/10 shrink-0">
               <Link
                 to="/profile"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors min-h-[52px]"
               >
                 <div className="w-10 h-10 rounded-full overflow-hidden border border-primary-container/30">
                   <img

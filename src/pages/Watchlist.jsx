@@ -306,7 +306,7 @@ function SearchModal({ open, onClose, onAdd, addedIds }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={handleClose} />
-      <div className="relative w-full sm:max-w-2xl sm:mx-4 bg-surface-container rounded-t-3xl sm:rounded-3xl border border-white/10 shadow-2xl max-h-[85vh] flex flex-col">
+      <div className="relative w-full sm:max-w-2xl sm:mx-4 bg-surface-container rounded-t-3xl sm:rounded-3xl border border-white/10 shadow-2xl max-h-[85vh] flex flex-col safe-area-bottom safe-area-x">
         <div className="flex items-center justify-between p-6 pb-0">
           <h2 className="text-[24px] font-bold text-on-surface">Add to Watchlist</h2>
           <button

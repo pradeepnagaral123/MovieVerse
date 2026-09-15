@@ -179,21 +179,21 @@ export default function SearchResults() {
             </div>
 
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-4 mt-12">
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-12">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-4 py-2 border border-white/10 rounded-lg text-[14px] font-bold disabled:opacity-30 hover:bg-white/5 transition-colors"
+                  className="px-4 py-2 border border-white/10 rounded-lg text-[14px] font-bold disabled:opacity-30 hover:bg-white/5 transition-colors min-h-[40px]"
                 >
                   Previous
                 </button>
-                <span className="text-on-surface-variant text-[14px]">
+                <span className="text-on-surface-variant text-[14px] px-1">
                   Page {page} of {totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="px-4 py-2 border border-white/10 rounded-lg text-[14px] font-bold disabled:opacity-30 hover:bg-white/5 transition-colors"
+                  className="px-4 py-2 border border-white/10 rounded-lg text-[14px] font-bold disabled:opacity-30 hover:bg-white/5 transition-colors min-h-[40px]"
                 >
                   Next
                 </button>

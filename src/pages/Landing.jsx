@@ -170,7 +170,7 @@ export default function Landing() {
               <span className="material-symbols-outlined text-secondary text-[16px]">local_fire_department</span>
               Built for those who breathe cinema
             </span>
-            <h1 className="text-[44px] md:text-[64px] leading-[1.05] font-black tracking-tight mb-6">
+            <h1 className="text-[36px] min-[400px]:text-[44px] md:text-[64px] leading-[1.05] font-black tracking-tight mb-6">
               Your next favorite movie is{' '}
               <span className="text-primary-container">one mood</span> away.
             </h1>
@@ -243,7 +243,7 @@ export default function Landing() {
               </h2>
             </div>
           </div>
-          <div className="flex gap-4 overflow-x-auto hide-scrollbar px-4 md:px-12 scroll-smooth">
+          <div className="flex gap-4 overflow-x-auto hide-scrollbar px-4 md:px-12 scroll-smooth horizontal-scroll-snap">
             {popular.slice(0, 10).map((movie) => (
               <MiniPoster key={movie.id} movie={movie} />
             ))}

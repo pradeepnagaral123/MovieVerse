@@ -197,20 +197,72 @@ body {
 }
 
 @media (max-width: 767px) {
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-area-x {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 
   button, a, [role="button"] {
     touch-action: manipulation;
   }
 
+  /* Disable text selection on chrome/navigation so rapid taps feel native */
+  nav,
+  .material-symbols-outlined {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
   input, textarea, select {
     font-size: 16px;
+    border-radius: 0.75rem;
+  }
+
+  /* Keep autofilled inputs on-brand instead of iOS' white/yellow fill */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #09232a inset;
+    -webkit-text-fill-color: #cde7f0;
+    caret-color: #cde7f0;
+  }
+
+  /* Opt-in snap scrolling for the horizontal poster rails */
+  .horizontal-scroll-snap {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .horizontal-scroll-snap > * {
+    scroll-snap-align: start;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .horizontal-marquee-track {
+    animation: none;
+  }
+  .animate-slide-in,
+  .rating-drift-line {
+    animation-duration: 0.01ms !important;
   }
 }

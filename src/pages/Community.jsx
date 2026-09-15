@@ -102,18 +102,18 @@ export default function Community() {
                 <h1 className="text-[28px] md:text-[48px] font-black text-white tracking-tight leading-[1.1]">
                   Your Year in Cinema
                 </h1>
-                <div className="flex gap-6 md:gap-12 mt-4 md:mt-6">
+                <div className="flex flex-wrap gap-x-6 gap-y-4 md:gap-x-12 mt-4 md:mt-6">
                   <div>
-                    <div className="text-2xl md:text-4xl font-black text-primary">42,840</div>
-                    <div className="text-sm text-on-surface-variant">Minutes Watched</div>
+                    <div className="text-xl min-[400px]:text-2xl md:text-4xl font-black text-primary">42,840</div>
+                    <div className="text-xs md:text-sm text-on-surface-variant">Minutes Watched</div>
                   </div>
                   <div>
-                    <div className="text-2xl md:text-4xl font-black text-primary">154</div>
+                    <div className="text-xl min-[400px]:text-2xl md:text-4xl font-black text-primary">154</div>
                     <div className="text-xs md:text-sm text-on-surface-variant">Films Logged</div>
                   </div>
                   <div>
-                    <div className="text-2xl md:text-4xl font-black text-primary">28</div>
-                    <div className="text-sm text-on-surface-variant">First-time Watches</div>
+                    <div className="text-xl min-[400px]:text-2xl md:text-4xl font-black text-primary">28</div>
+                    <div className="text-xs md:text-sm text-on-surface-variant">First-time Watches</div>
                   </div>
                 </div>
               </div>

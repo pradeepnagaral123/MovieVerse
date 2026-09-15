@@ -187,7 +187,7 @@ export default function FilmDetail() {
                   A thief who steals corporate secrets through the use of dream-sharing technology is
                   given the inverse task of planting an idea into the mind of a C.E.O.
                 </p>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-3">
                   <button className="px-6 md:px-8 py-2.5 md:py-3 bg-primary-container text-on-primary-container text-[16px] md:text-[24px] rounded-lg flex items-center gap-2 hover:scale-105 transition-transform bloom-effect font-bold">
                     <span
                       className="material-symbols-outlined"

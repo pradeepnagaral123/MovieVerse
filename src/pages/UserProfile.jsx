@@ -55,7 +55,7 @@ export default function UserProfile() {
               </h1>
               <p className="text-on-surface-variant text-[16px]">@johncineVerse &bull; Film Critic</p>
             </div>
-            <div className="flex gap-3 pb-2">
+            <div className="flex flex-wrap gap-3 pb-2">
               <button className="px-6 py-2 bg-primary-container text-on-primary-container font-bold rounded-lg hover:scale-105 transition-transform text-[14px]">
                 Edit Profile
               </button>
@@ -86,12 +86,12 @@ export default function UserProfile() {
 
       {/* Tabs */}
       <section className="max-w-[1280px] mx-auto px-4 md:px-12">
-        <div className="flex gap-6 border-b border-white/10 mb-8">
+        <div className="flex gap-5 sm:gap-6 border-b border-white/10 mb-8 overflow-x-auto hide-scrollbar">
           {tabOptions.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-3 text-[14px] font-bold transition-colors ${
+              className={`pb-3 whitespace-nowrap text-[14px] font-bold transition-colors ${
                 activeTab === tab
                   ? 'text-primary-container border-b-2 border-primary-container'
                   : 'text-on-surface-variant hover:text-on-surface'

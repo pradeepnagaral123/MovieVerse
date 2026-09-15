@@ -147,7 +147,7 @@ function ScrollRow({ children, title, icon }) {
       </div>
       <div
         ref={scrollRef[0]}
-        className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth"
+        className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth horizontal-scroll-snap"
       >
         {children}
       </div>
@@ -192,7 +192,7 @@ export default function TVShows() {
       <main className="xl:ml-64 pt-28 px-4 md:px-12 pb-24 md:pb-20 max-w-[1400px]">
         <section className="mb-12">
           <div className="max-w-3xl">
-            <h1 className="text-[32px] md:text-[48px] mb-4 leading-tight font-black tracking-tight">
+            <h1 className="text-[28px] min-[400px]:text-[32px] md:text-[48px] mb-4 leading-tight font-black tracking-tight">
               Discover <span className="text-primary-container">TV Shows</span>
             </h1>
             <p className="text-on-surface-variant text-[16px] leading-relaxed mb-6">
@@ -244,7 +244,7 @@ export default function TVShows() {
               ))}
             </div>
           ) : (
-            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth">
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth horizontal-scroll-snap">
               {trending.slice(0, 10).map((show) => (
                 <TVCard key={show.id} show={show} variant="hero" />
               ))}

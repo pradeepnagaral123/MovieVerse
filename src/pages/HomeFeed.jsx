@@ -14,7 +14,7 @@ function MovieCard({ movie, variant = 'poster', onDetails }) {
 
   if (variant === 'hero') {
     return (
-      <div className="relative min-w-[280px] md:min-w-[480px] h-[220px] md:h-[280px] rounded-2xl overflow-hidden group cursor-pointer flex-shrink-0 border border-white/10">
+      <div className="relative w-[85vw] min-w-[260px] max-w-[420px] md:w-auto md:min-w-[480px] md:max-w-none h-[200px] sm:h-[220px] md:h-[280px] rounded-2xl overflow-hidden group cursor-pointer shrink-0 border border-white/10">
         {!imgError && backdropUrl(movie.backdrop_path) ? (
           <img
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -106,7 +106,7 @@ function MovieCard({ movie, variant = 'poster', onDetails }) {
 function MovieCardSkeleton({ variant = 'poster' }) {
   if (variant === 'hero') {
     return (
-      <div className="relative min-w-[280px] md:min-w-[480px] h-[220px] md:h-[280px] rounded-2xl overflow-hidden flex-shrink-0 border border-white/10 bg-surface-container-high animate-pulse">
+      <div className="relative w-[85vw] min-w-[260px] max-w-[420px] md:w-auto md:min-w-[480px] md:max-w-none h-[200px] sm:h-[220px] md:h-[280px] rounded-2xl overflow-hidden shrink-0 border border-white/10 bg-surface-container-high animate-pulse">
         <div className="absolute bottom-0 left-0 right-0 p-6 space-y-3">
           <div className="h-4 bg-surface-container-highest rounded w-24" />
           <div className="h-6 bg-surface-container-highest rounded w-48" />
@@ -177,7 +177,7 @@ export default function HomeFeed() {
         {/* Vibe Search Header */}
         <section className="mb-12">
           <div className="max-w-3xl">
-            <h1 className="text-[32px] md:text-[48px] mb-6 leading-tight font-black tracking-tight">
+            <h1 className="text-[28px] min-[400px]:text-[32px] md:text-[48px] mb-5 md:mb-6 leading-tight font-black tracking-tight">
               What's the <span className="text-primary-container">vibe</span> tonight?
             </h1>
             <form onSubmit={handleSearch} className="relative search-glow transition-all duration-300 rounded-2xl">
@@ -223,7 +223,7 @@ export default function HomeFeed() {
                   ))}
                 </div>
               ) : (
-                <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth">
+                <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth horizontal-scroll-snap">
                   {trending.slice(0, 10).map((movie) => (
                     <MovieCard key={movie.id} movie={movie} variant="hero" onDetails={handleDetails} />
                   ))}
@@ -246,7 +246,7 @@ export default function HomeFeed() {
                   ))}
                 </div>
               ) : (
-                <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth">
+                <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 scroll-smooth horizontal-scroll-snap">
                   {upcoming.slice(0, 12).map((movie) => (
                     <MovieCard key={movie.id} movie={movie} onDetails={handleDetails} />
                   ))}
