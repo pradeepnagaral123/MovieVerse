@@ -159,7 +159,7 @@ function MovieCard({ movie, onRemove, onDetails }) {
             </span>
           </div>
         )}
-        <div className="absolute inset-0 flex flex-col justify-end p-3 md:p-4 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-background/60 backdrop-blur-sm">
+        <div className="absolute inset-0 flex flex-col justify-end p-3 md:p-4 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-gradient-to-t from-background/80 via-background/10 to-transparent md:backdrop-blur-sm">
           <button className="w-full bg-primary-container text-on-primary-container py-2.5 md:py-3 rounded-lg font-bold flex items-center justify-center gap-2 mb-2 md:mb-3 active:scale-95 transition-transform text-[13px] md:text-[14px]">
             <span className="material-symbols-outlined text-[18px] md:text-[20px]">play_arrow</span> Watch Now
           </button>
