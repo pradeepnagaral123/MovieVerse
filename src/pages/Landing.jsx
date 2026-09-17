@@ -82,6 +82,35 @@ const genrePills = ['Sci-Fi', 'Drama', 'Thriller', 'Animation', 'Romance', 'Crim
 
 const POSTER_SIZES = ['aspect-[2/3]', 'aspect-[2/3]', 'aspect-[5/8]', 'aspect-[2/3]', 'aspect-[9/14]', 'aspect-[2/3]'];
 
+const EVERGREEN_FILMS = [
+  { id: 27205, title: 'Inception', release_date: '2010-07-16', vote_average: 8.4, poster_path: '/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg' },
+  { id: 157336, title: 'Interstellar', release_date: '2014-11-07', vote_average: 8.4, poster_path: '/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg' },
+  { id: 155, title: 'The Dark Knight', release_date: '2008-07-18', vote_average: 8.5, poster_path: '/qJ2tW6WMUDux911BTUgMe1nF1iC.jpg' },
+  { id: 278, title: 'The Shawshank Redemption', release_date: '1994-09-23', vote_average: 8.7, poster_path: '/9cjIGRiQoRCgTNEMmcoAjM3lGRx.jpg' },
+  { id: 240, title: 'The Godfather', release_date: '1972-03-14', vote_average: 8.7, poster_path: '/3bhkrj58Vtu7enYsRolD1fZdja1.jpg' },
+  { id: 680, title: 'Pulp Fiction', release_date: '1994-09-10', vote_average: 8.5, poster_path: '/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg' },
+  { id: 13, title: 'Forrest Gump', release_date: '1994-07-06', vote_average: 8.5, poster_path: '/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg' },
+  { id: 550, title: 'Fight Club', release_date: '1999-10-15', vote_average: 8.4, poster_path: '/pB8BM7pdSp6B6Ih7QI4S2t0POoT.jpg' },
+  { id: 603, title: 'The Matrix', release_date: '1999-03-31', vote_average: 8.2, poster_path: '/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg' },
+  { id: 121, title: 'The Lord of the Rings: The Fellowship of the Ring', release_date: '2001-12-19', vote_average: 8.4, poster_path: '/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg' },
+  { id: 122, title: 'The Lord of the Rings: The Two Towers', release_date: '2002-12-18', vote_average: 8.4, poster_path: '/5VTN0pR8gcqV3EPUHHfMGnJYN9L.jpg' },
+  { id: 120, title: 'The Lord of the Rings: The Return of the King', release_date: '2003-12-17', vote_average: 8.5, poster_path: '/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg' },
+  { id: 11, title: 'Star Wars: Episode IV - A New Hope', release_date: '1977-05-25', vote_average: 8.2, poster_path: '/6FfCtAuVAW8XJjZ7eWePRL5WCJH.jpg' },
+  { id: 1891, title: 'The Empire Strikes Back', release_date: '1980-05-20', vote_average: 8.4, poster_path: '/7BuH8itoSrLExs2YZSs85G9Qzqg.jpg' },
+  { id: 628, title: 'Return of the Jedi', release_date: '1983-05-25', vote_average: 8.0, poster_path: '/lrNWmH7eGE5wJ2Yxk0XgYwb0uF.jpg' },
+  { id: 24428, title: 'The Avengers', release_date: '2012-04-25', vote_average: 7.8, poster_path: '/cezWGskPY5x7GALUT19m3K1SXyJ.jpg' },
+  { id: 299534, title: 'Avengers: Endgame', release_date: '2019-04-24', vote_average: 8.3, poster_path: '/or06FN3Dka5tukK1e9sl16pB3iy.jpg' },
+  { id: 496243, title: 'Parasite', release_date: '2019-05-30', vote_average: 8.5, poster_path: '/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg' },
+  { id: 807, title: 'Se7en', release_date: '1995-09-22', vote_average: 8.4, poster_path: '/6yoghtyTpznpBik8EngEmJskVUO.jpg' },
+  { id: 324857, title: 'Spider-Man: Into the Spider-Verse', release_date: '2018-12-14', vote_average: 8.4, poster_path: '/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg' },
+  { id: 769, title: 'Goodfellas', release_date: '1990-09-12', vote_average: 8.5, poster_path: '/aKuFiU82s5ISJpGZp7YkIr3kCUd.jpg' },
+  { id: 280, title: 'Terminator 2: Judgment Day', release_date: '1991-07-03', vote_average: 8.2, poster_path: '/5M0ij0I6yEZdbETmkA9mPtB5vBR.jpg' },
+  { id: 129, title: 'Spirited Away', release_date: '2001-07-20', vote_average: 8.5, poster_path: '/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg' },
+  { id: 274, title: 'The Silence of the Lambs', release_date: '1991-02-14', vote_average: 8.3, poster_path: '/uS9m8OBk1A8eM9I042bxgXXEWA.png' },
+  { id: 857, title: 'Saving Private Ryan', release_date: '1998-07-24', vote_average: 8.2, poster_path: '/uqx37cP6XkTdLJ4eFQe2XUDf3dH.jpg' },
+  { id: 272, title: 'Batman Begins', release_date: '2005-06-15', vote_average: 7.8, poster_path: '/4MpN4kIEqUjW8OPtOQJXkT8iVRV.jpg' },
+];
+
 export default function Landing() {
   const [authOpen, setAuthOpen] = useState(false);
   const [heroMovies, setHeroMovies] = useState([]);
@@ -120,10 +149,10 @@ export default function Landing() {
   }, []);
 
   const heroFilms = [...new Map(
-    [...popular, ...nowPlaying, ...heroMovies, ...upcoming]
+    [...EVERGREEN_FILMS, ...popular, ...nowPlaying, ...heroMovies, ...upcoming]
       .filter((m) => m && m.poster_path)
       .map((m) => [m.id, m])
-  ).values()].slice(0, 30);
+  ).values()].slice(0, 24);
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
