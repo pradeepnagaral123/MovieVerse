@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import AuthModal from '../components/AuthModal';
-import { getTrendingMovies, getPopularMovies, getAnticipatedMovies, getNowPlayingMovies, getMovieDetails, posterUrl, backdropUrl } from '../services/tmdb';
+import { getTrendingMovies, getPopularMovies, getAnticipatedMovies, getNowPlayingMovies, getOTTRecentMovies, getPopularIndianMovies, getMovieDetails, posterUrl, backdropUrl } from '../services/tmdb';
 
 const features = [
   {
@@ -82,33 +82,31 @@ const genrePills = ['Sci-Fi', 'Drama', 'Thriller', 'Animation', 'Romance', 'Crim
 
 const POSTER_SIZES = ['aspect-[2/3]', 'aspect-[2/3]', 'aspect-[5/8]', 'aspect-[2/3]', 'aspect-[9/14]', 'aspect-[2/3]'];
 
-const EVERGREEN_FILMS = [
-  { id: 27205, title: 'Inception', release_date: '2010-07-16', vote_average: 8.4, poster_path: '/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg' },
-  { id: 157336, title: 'Interstellar', release_date: '2014-11-07', vote_average: 8.4, poster_path: '/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg' },
-  { id: 155, title: 'The Dark Knight', release_date: '2008-07-18', vote_average: 8.5, poster_path: '/qJ2tW6WMUDux911BTUgMe1nF1iC.jpg' },
-  { id: 278, title: 'The Shawshank Redemption', release_date: '1994-09-23', vote_average: 8.7, poster_path: '/9cjIGRiQoRCgTNEMmcoAjM3lGRx.jpg' },
-  { id: 240, title: 'The Godfather', release_date: '1972-03-14', vote_average: 8.7, poster_path: '/3bhkrj58Vtu7enYsRolD1fZdja1.jpg' },
-  { id: 680, title: 'Pulp Fiction', release_date: '1994-09-10', vote_average: 8.5, poster_path: '/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg' },
-  { id: 13, title: 'Forrest Gump', release_date: '1994-07-06', vote_average: 8.5, poster_path: '/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg' },
-  { id: 550, title: 'Fight Club', release_date: '1999-10-15', vote_average: 8.4, poster_path: '/pB8BM7pdSp6B6Ih7QI4S2t0POoT.jpg' },
-  { id: 603, title: 'The Matrix', release_date: '1999-03-31', vote_average: 8.2, poster_path: '/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg' },
-  { id: 121, title: 'The Lord of the Rings: The Fellowship of the Ring', release_date: '2001-12-19', vote_average: 8.4, poster_path: '/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg' },
-  { id: 122, title: 'The Lord of the Rings: The Two Towers', release_date: '2002-12-18', vote_average: 8.4, poster_path: '/5VTN0pR8gcqV3EPUHHfMGnJYN9L.jpg' },
-  { id: 120, title: 'The Lord of the Rings: The Return of the King', release_date: '2003-12-17', vote_average: 8.5, poster_path: '/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg' },
-  { id: 11, title: 'Star Wars: Episode IV - A New Hope', release_date: '1977-05-25', vote_average: 8.2, poster_path: '/6FfCtAuVAW8XJjZ7eWePRL5WCJH.jpg' },
-  { id: 1891, title: 'The Empire Strikes Back', release_date: '1980-05-20', vote_average: 8.4, poster_path: '/7BuH8itoSrLExs2YZSs85G9Qzqg.jpg' },
-  { id: 628, title: 'Return of the Jedi', release_date: '1983-05-25', vote_average: 8.0, poster_path: '/lrNWmH7eGE5wJ2Yxk0XgYwb0uF.jpg' },
-  { id: 24428, title: 'The Avengers', release_date: '2012-04-25', vote_average: 7.8, poster_path: '/cezWGskPY5x7GALUT19m3K1SXyJ.jpg' },
-  { id: 299534, title: 'Avengers: Endgame', release_date: '2019-04-24', vote_average: 8.3, poster_path: '/or06FN3Dka5tukK1e9sl16pB3iy.jpg' },
-  { id: 496243, title: 'Parasite', release_date: '2019-05-30', vote_average: 8.5, poster_path: '/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg' },
-  { id: 807, title: 'Se7en', release_date: '1995-09-22', vote_average: 8.4, poster_path: '/6yoghtyTpznpBik8EngEmJskVUO.jpg' },
-  { id: 324857, title: 'Spider-Man: Into the Spider-Verse', release_date: '2018-12-14', vote_average: 8.4, poster_path: '/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg' },
-  { id: 769, title: 'Goodfellas', release_date: '1990-09-12', vote_average: 8.5, poster_path: '/aKuFiU82s5ISJpGZp7YkIr3kCUd.jpg' },
-  { id: 280, title: 'Terminator 2: Judgment Day', release_date: '1991-07-03', vote_average: 8.2, poster_path: '/5M0ij0I6yEZdbETmkA9mPtB5vBR.jpg' },
-  { id: 129, title: 'Spirited Away', release_date: '2001-07-20', vote_average: 8.5, poster_path: '/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg' },
-  { id: 274, title: 'The Silence of the Lambs', release_date: '1991-02-14', vote_average: 8.3, poster_path: '/uS9m8OBk1A8eM9I042bxgXXEWA.png' },
-  { id: 857, title: 'Saving Private Ryan', release_date: '1998-07-24', vote_average: 8.2, poster_path: '/uqx37cP6XkTdLJ4eFQe2XUDf3dH.jpg' },
-  { id: 272, title: 'Batman Begins', release_date: '2005-06-15', vote_average: 7.8, poster_path: '/4MpN4kIEqUjW8OPtOQJXkT8iVRV.jpg' },
+const HERO_FALLBACK_FILMS = [
+  { id: 155, title: 'The Dark Knight', release_date: '2008-07-18', vote_average: 8.5, poster_path: '/qJ2tW6WMUDux911BTUgMe1nF1iC.jpg', badge: 'Popular' },
+  { id: 27205, title: 'Inception', release_date: '2010-07-16', vote_average: 8.4, poster_path: '/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg', badge: 'Popular' },
+  { id: 157336, title: 'Interstellar', release_date: '2014-11-07', vote_average: 8.4, poster_path: '/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg', badge: 'Popular' },
+  { id: 299534, title: 'Avengers: Endgame', release_date: '2019-04-24', vote_average: 8.3, poster_path: '/or06FN3Dka5tukK1e9sl16pB3iy.jpg', badge: 'Popular' },
+  { id: 324857, title: 'Spider-Man: Into the Spider-Verse', release_date: '2018-12-14', vote_average: 8.4, poster_path: '/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg', badge: 'Popular' },
+  { id: 545609, title: 'Extraction', release_date: '2020-04-24', vote_average: 7.3, poster_path: '/nygOUcBKPHFTbxsYRFZVePqgPK6.jpg', badge: 'On OTT' },
+  { id: 438631, title: 'Dune', release_date: '2021-09-15', vote_average: 8.0, poster_path: '/v1tRXZ4JtD2Iv6fjkPvT4GiwslV.jpg', badge: 'On OTT' },
+  { id: 473033, title: 'Uncut Gems', release_date: '2019-12-13', vote_average: 7.4, poster_path: '/6XN1vxHc7kUSqNWtaQKN45J5x2v.jpg', badge: 'On OTT' },
+  { id: 486947, title: 'The Guilty', release_date: '2021-09-24', vote_average: 6.7, poster_path: '/42QPG6p7oLcLd4LQOPeSTLhqfMx.jpg', badge: 'On OTT' },
+  { id: 546554, title: 'Knives Out', release_date: '2019-11-27', vote_average: 7.9, poster_path: '/pThyQovXQrw2m0s9x82twj48Jq4.jpg', badge: 'On OTT' },
+  { id: 872585, title: 'Oppenheimer', release_date: '2023-07-21', vote_average: 8.1, poster_path: '/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg', badge: 'In Theaters' },
+  { id: 346698, title: 'Barbie', release_date: '2023-07-21', vote_average: 7.7, poster_path: '/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg', badge: 'In Theaters' },
+  { id: 634649, title: 'Spider-Man: No Way Home', release_date: '2021-12-15', vote_average: 8.0, poster_path: '/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg', badge: 'In Theaters' },
+  { id: 693134, title: 'Dune: Part Two', release_date: '2024-02-27', vote_average: 8.2, poster_path: '/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg', badge: 'In Theaters' },
+  { id: 533535, title: 'Deadpool & Wolverine', release_date: '2024-07-24', vote_average: 7.7, poster_path: '/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg', badge: 'In Theaters' },
+  { id: 579974, title: 'RRR', release_date: '2022-03-24', vote_average: 8.0, poster_path: '/u0XUBNQWlOvrh0Gd97ARGpIkL0.jpg', badge: 'India' },
+  { id: 360814, title: 'Dangal', release_date: '2016-12-23', vote_average: 8.2, poster_path: '/cJRPOLEexI7qp2DKtFfCh7YaaUG.jpg', badge: 'India' },
+  { id: 20453, title: '3 Idiots', release_date: '2009-12-23', vote_average: 8.2, poster_path: '/66A9MqXOyVFCssoloscw79z8Tew.jpg', badge: 'India' },
+  { id: 587412, title: 'K.G.F: Chapter 2', release_date: '2022-04-14', vote_average: 8.0, poster_path: '/khNVygolU0TxLIDWff5tQlAhZ23.jpg', badge: 'India' },
+  { id: 872906, title: 'Jawan', release_date: '2023-09-07', vote_average: 7.7, poster_path: '/jFt1gS4BGHlK8xt76Y81Alp4dbt.jpg', badge: 'India' },
+  { id: 19404, title: 'Dilwale Dulhania Le Jayenge', release_date: '1995-10-20', vote_average: 8.1, poster_path: '/lfRkUr7DYdHldAqi3PwdQGBRBPM.jpg', badge: 'India' },
+  { id: 603692, title: 'The Batman', release_date: '2022-03-01', vote_average: 7.8, poster_path: '/kTQ3J8xHH1qR9zFblLA3pB2zQnc.jpg', badge: 'On OTT' },
+  { id: 335984, title: 'Blade Runner 2049', release_date: '2017-10-04', vote_average: 8.0, poster_path: '/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg', badge: 'On OTT' },
+  { id: 329865, title: 'Arrival', release_date: '2016-11-10', vote_average: 7.9, poster_path: '/pEzNVQfdzYDzVK0XqxERIw2x2se.jpg', badge: 'In Theaters' },
 ];
 
 export default function Landing() {
@@ -117,6 +115,9 @@ export default function Landing() {
   const [popular, setPopular] = useState([]);
   const [upcoming, setUpcoming] = useState([]);
   const [nowPlaying, setNowPlaying] = useState([]);
+  const [ott, setOtt] = useState([]);
+  const [indian, setIndian] = useState([]);
+  const [extraPopular, setExtraPopular] = useState([]);
   const [loading, setLoading] = useState(true);
   const [scrolled, setScrolled] = useState(false);
 
@@ -129,16 +130,22 @@ export default function Landing() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [trendingData, popularData, upcomingData, nowPlayingData] = await Promise.all([
+        const [trendingData, popularData, popularData2, upcomingData, nowPlayingData, ottData, indianData] = await Promise.all([
           getTrendingMovies('week'),
           getPopularMovies(),
+          getPopularMovies(2),
           getAnticipatedMovies(),
           getNowPlayingMovies(),
+          getOTTRecentMovies(),
+          getPopularIndianMovies(),
         ]);
         setHeroMovies(trendingData.results.filter((m) => m.poster_path));
         setPopular(popularData.results);
+        setExtraPopular(popularData2.results);
         setUpcoming(upcomingData.results);
         setNowPlaying(nowPlayingData.results);
+        setOtt(ottData.results);
+        setIndian(indianData.results);
       } catch (err) {
         console.error('Failed to fetch landing data:', err);
       } finally {
@@ -148,11 +155,45 @@ export default function Landing() {
     fetchData();
   }, []);
 
-  const heroFilms = [...new Map(
-    [...EVERGREEN_FILMS, ...popular, ...nowPlaying, ...heroMovies, ...upcoming]
-      .filter((m) => m && m.poster_path)
-      .map((m) => [m.id, m])
-  ).values()].slice(0, 24);
+  const heroFilms = (() => {
+    const sections = [
+      { list: popular, badge: 'Popular' },
+      { list: ott, badge: 'On OTT' },
+      { list: nowPlaying, badge: 'In Theaters' },
+      { list: indian, badge: 'India' },
+      { list: upcoming, badge: 'Upcoming' },
+    ];
+    const seen = new Set();
+    const packed = [];
+    const push = (m, badge) => {
+      if (packed.length >= 24 || !m || !m.poster_path || seen.has(m.id)) return false;
+      seen.add(m.id);
+      packed.push({ ...m, badge });
+      return true;
+    };
+    let added = true;
+    while (added && packed.length < 24) {
+      added = false;
+      for (const sec of sections) {
+        for (const m of sec.list) {
+          if (push(m, sec.badge)) {
+            added = true;
+            break;
+          }
+        }
+        if (packed.length >= 24) break;
+      }
+    }
+    for (const m of extraPopular) {
+      if (packed.length >= 24) break;
+      push(m, 'Popular');
+    }
+    for (const m of HERO_FALLBACK_FILMS) {
+      if (packed.length >= 24) break;
+      push(m, m.badge);
+    }
+    return packed;
+  })();
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
@@ -541,7 +582,7 @@ function PosterTile({ movie, className, aspectClass = 'aspect-[2/3]' }) {
   const poster = posterUrl(movie.poster_path, 'w342');
 
   return (
-    <div className={`break-inside-avoid mb-2 rounded-lg overflow-hidden shadow-lg border border-white/10 w-full ${aspectClass} ${className}`}>
+    <div className={`break-inside-avoid relative mb-2 rounded-lg overflow-hidden shadow-lg border border-white/10 w-full ${aspectClass} ${className}`}>
       {!imgError && poster ? (
         <img
           className="w-full h-full object-cover"
@@ -553,6 +594,11 @@ function PosterTile({ movie, className, aspectClass = 'aspect-[2/3]' }) {
       ) : (
         <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
           <span className="material-symbols-outlined text-4xl text-on-surface-variant">movie</span>
+        </div>
+      )}
+      {movie.badge && (
+        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/65 backdrop-blur-sm border border-white/10 text-[9px] font-black tracking-wider uppercase text-white/90">
+          {movie.badge}
         </div>
       )}
     </div>

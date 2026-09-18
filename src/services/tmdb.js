@@ -596,6 +596,46 @@ export async function getNowPlayingMovies(page = 1) {
   };
 }
 
+export async function getOTTRecentMovies(page = 1) {
+  if (!TMDB_API_KEY) {
+    await new Promise((r) => setTimeout(r, 500));
+    return { results: MOCK_MOVIES.slice(0, 8) };
+  }
+  const since = new Date();
+  since.setFullYear(since.getFullYear() - 2);
+  const data = await fetchTMDB('/discover/movie', {
+    with_watch_providers: '8|9|337|384|350|15|386',
+    watch_region: 'US',
+    sort_by: 'primary_release_date.desc',
+    'primary_release_date.gte': since.toISOString().slice(0, 10),
+    'vote_count.gte': '100',
+    page,
+  });
+  return {
+    results: data.results,
+    total_results: data.total_results,
+    total_pages: data.total_pages,
+  };
+}
+
+export async function getPopularIndianMovies(page = 1) {
+  if (!TMDB_API_KEY) {
+    await new Promise((r) => setTimeout(r, 500));
+    return { results: [], total_results: 0, total_pages: 0 };
+  }
+  const data = await fetchTMDB('/discover/movie', {
+    with_origin_country: 'IN',
+    sort_by: 'popularity.desc',
+    'vote_count.gte': '100',
+    page,
+  });
+  return {
+    results: data.results,
+    total_results: data.total_results,
+    total_pages: data.total_pages,
+  };
+}
+
 export async function getMovieDetails(id) {
   if (!TMDB_API_KEY) {
     await new Promise((r) => setTimeout(r, 400));
