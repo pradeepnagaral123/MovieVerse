@@ -165,14 +165,15 @@ export default function Landing() {
     ];
     const seen = new Set();
     const packed = [];
+    const HERO_WALL_CAP = 24; // 2 rows * 12 columns = 24 unique total
     const push = (m, badge) => {
-      if (packed.length >= 24 || !m || !m.poster_path || seen.has(m.id)) return false;
+      if (packed.length >= HERO_WALL_CAP || !m || !m.poster_path || seen.has(m.id)) return false;
       seen.add(m.id);
       packed.push({ ...m, badge });
       return true;
     };
     let added = true;
-    while (added && packed.length < 24) {
+    while (added && packed.length < HERO_WALL_CAP) {
       added = false;
       for (const sec of sections) {
         for (const m of sec.list) {
@@ -181,15 +182,15 @@ export default function Landing() {
             break;
           }
         }
-        if (packed.length >= 24) break;
+        if (packed.length >= HERO_WALL_CAP) break;
       }
     }
     for (const m of extraPopular) {
-      if (packed.length >= 24) break;
+      if (packed.length >= HERO_WALL_CAP) break;
       push(m, 'Popular');
     }
     for (const m of HERO_FALLBACK_FILMS) {
-      if (packed.length >= 24) break;
+      if (packed.length >= HERO_WALL_CAP) break;
       push(m, m.badge);
     }
     return packed;
@@ -202,14 +203,14 @@ export default function Landing() {
         {/* Background: masonry wall of posters, slowly drifting horizontally */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="horizontal-marquee-track">
-            <div className="w-[100vw] shrink-0 columns-3 sm:columns-4 lg:columns-5 xl:columns-6 gap-2">
-              {heroFilms.map((movie, i) => (
-                <PosterTile key={`${movie.id}-a`} movie={movie} aspectClass={POSTER_SIZES[i % POSTER_SIZES.length]} />
+            <div className="w-[100vw] shrink-0 grid grid-rows-2 grid-flow-col auto-cols-[calc(100vw/12)] gap-1.5">
+              {heroFilms.slice(0, 24).map((movie, i) => (
+                <PosterTile key={`${movie.id}-a`} movie={movie} aspectClass="aspect-[2/3] h-full" />
               ))}
             </div>
-            <div className="w-[100vw] shrink-0 columns-3 sm:columns-4 lg:columns-5 xl:columns-6 gap-2">
-              {heroFilms.map((movie, i) => (
-                <PosterTile key={`${movie.id}-b`} movie={movie} aspectClass={POSTER_SIZES[i % POSTER_SIZES.length]} />
+            <div className="w-[100vw] shrink-0 grid grid-rows-2 grid-flow-col auto-cols-[calc(100vw/12)] gap-1.5">
+              {heroFilms.slice(0, 24).map((movie, i) => (
+                <PosterTile key={`${movie.id}-b`} movie={movie} aspectClass="aspect-[2/3] h-full" />
               ))}
             </div>
           </div>
@@ -589,6 +590,7 @@ function PosterTile({ movie, className, aspectClass = 'aspect-[2/3]' }) {
           src={poster}
           alt={movie.title || ''}
           loading="lazy"
+          decoding="async"
           onError={() => setImgError(true)}
         />
       ) : (
