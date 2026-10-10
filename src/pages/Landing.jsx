@@ -203,14 +203,14 @@ export default function Landing() {
         {/* Background: masonry wall of posters, slowly drifting horizontally */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="horizontal-marquee-track">
-            <div className="w-[100vw] shrink-0 grid grid-rows-2 grid-flow-col auto-cols-[calc(100vw/12)] gap-1.5">
-              {heroFilms.slice(0, 24).map((movie, i) => (
-                <PosterTile key={`${movie.id}-a`} movie={movie} aspectClass="aspect-[2/3] h-full" />
+            <div className="w-max shrink-0 grid grid-rows-2 grid-flow-col auto-cols-[min(20vw,33.333vh)] gap-1.5">
+              {heroFilms.slice(0, 24).map((movie) => (
+                <PosterTile key={`${movie.id}-a`} movie={movie} aspectClass="aspect-[2/3]" />
               ))}
             </div>
-            <div className="w-[100vw] shrink-0 grid grid-rows-2 grid-flow-col auto-cols-[calc(100vw/12)] gap-1.5">
-              {heroFilms.slice(0, 24).map((movie, i) => (
-                <PosterTile key={`${movie.id}-b`} movie={movie} aspectClass="aspect-[2/3] h-full" />
+            <div className="w-max shrink-0 grid grid-rows-2 grid-flow-col auto-cols-[min(20vw,33.333vh)] gap-1.5">
+              {heroFilms.slice(0, 24).map((movie) => (
+                <PosterTile key={`${movie.id}-b`} movie={movie} aspectClass="aspect-[2/3]" />
               ))}
             </div>
           </div>
