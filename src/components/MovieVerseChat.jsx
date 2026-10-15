@@ -6,18 +6,11 @@ const STORAGE_KEY = 'cineVerse_chat_history';
 
 const FAB_ROUTES = ['/home', '/tv', '/lists', '/profile'];
 
-const SUGGESTIONS = [
-  'A movie that feels like a warm hug',
-  'Kannada hidden gems from the 2010s',
-  'Explain the ending of Inception (spoilers ok)',
-  'Underrated sci-fi with a mind-bending twist',
-];
-
 const GREETING = {
   id: 'greeting',
   role: 'assistant',
   content:
-    "Hey — I'm **MovieVerse AI** 🎬\n\nI live and breathe cinema, from Kannada and Korean to Hollywood and indie gems. Tell me the mood you're in, a language you're craving, or a film you've been meaning to unravel — and I'll find something that actually fits.\n\nWhat are we watching tonight?",
+    "Hey, I'm **MovieVerse AI**. Tell me a mood, a language, or a film — and I'll find something that fits. What are we watching tonight?",
   cards: [],
 };
 
@@ -420,19 +413,6 @@ export default function MovieVerseChat() {
                 </div>
               ))}
 
-              {messages.length <= 1 && (
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {SUGGESTIONS.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => sendMessage(s)}
-                      className="px-3 py-2 rounded-full bg-surface-container-high border border-white/10 text-[12px] text-on-surface-variant hover:border-primary-container hover:text-primary-container transition-colors text-left cursor-pointer"
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Input */}
