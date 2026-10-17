@@ -1,8 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { streamMovieVerseChat, parseMovieBlock, resolveMovieCards, buildTmdbContext, isChatConfigured } from '../services/chat';
+import AuthModal from './AuthModal';
 
 const STORAGE_KEY = 'cineVerse_chat_history';
+const AUTH_KEY = 'cineVerse_auth';
+
+function isAuthenticated() {
+  return localStorage.getItem(AUTH_KEY) === 'true';
+}
 
 const FAB_ROUTES = ['/home', '/tv', '/lists', '/profile'];
 
@@ -193,6 +199,7 @@ export default function MovieVerseChat() {
   const { pathname } = useLocation();
 
   const [open, setOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const [messages, setMessages] = useState(loadHistory);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
@@ -316,7 +323,13 @@ export default function MovieVerseChat() {
     <>
       {!open && (
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            if (!isAuthenticated()) {
+              setAuthOpen(true);
+              return;
+            }
+            setOpen(true);
+          }}
           aria-label="Open MovieVerse AI chat"
           className={`fixed z-[80] ${launcherPosition} group flex items-center gap-2 pl-4 pr-5 py-3 rounded-full bg-gradient-to-r from-primary-container to-[#ff5e00] text-on-primary-container shadow-[0_10px_30px_-6px_rgba(255,128,0,0.6)] hover:brightness-110 active:scale-95 transition-all cursor-pointer`}
         >
@@ -455,6 +468,15 @@ export default function MovieVerseChat() {
           </div>
         </div>
       )}
+
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onSuccess={() => {
+          setAuthOpen(false);
+          setOpen(true);
+        }}
+      />
     </>
   );
 }

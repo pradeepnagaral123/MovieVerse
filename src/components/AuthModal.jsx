@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function AuthModal({ open, onClose }) {
+export default function AuthModal({ open, onClose, onSuccess }) {
   const navigate = useNavigate();
   const [tab, setTab] = useState('signup');
 
@@ -9,6 +9,8 @@ export default function AuthModal({ open, onClose }) {
 
   const enterApp = (e) => {
     e.preventDefault();
+    localStorage.setItem('cineVerse_auth', 'true');
+    onSuccess?.();
     navigate('/home');
   };
 
